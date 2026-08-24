@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NORIKAE RUSH</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --line: #30363d;
+      --text: #f0f6fc;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --good: #3fb950;
+      --warn: #d29922;
+      --danger: #f85149;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #182235, var(--bg) 45%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap { width: min(920px, 94vw); margin: 0 auto; padding: 26px 0 44px; }
+    .brand { font-weight: 900; letter-spacing: .08em; font-size: clamp(26px, 5vw, 44px); }
+    .tag { color: var(--muted); margin-top: 4px; }
+    .card {
+      background: rgba(22,27,34,.95);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+      margin-top: 18px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.25);
+    }
+    .hero { display: grid; gap: 16px; text-align: center; padding: 38px 22px; }
+    .hero h1 { margin: 0; font-size: clamp(34px, 7vw, 64px); }
+    .hero p { color: var(--muted); margin: 0; }
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .primary { background: var(--accent); color: #08101c; }
+    .ghost { background: #21262d; color: var(--text); border: 1px solid var(--line); }
+    .grid { display: grid; gap: 12px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .stationBtn { background:#21262d; color:var(--text); border:1px solid var(--line); }
+    .stationBtn:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .route {
+      font-size: 18px;
+      line-height: 1.7;
+      word-break: keep-all;
+    }
+    .route span { color: var(--accent); font-weight: 800; }
+    .topbar { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+    .top-actions { display:flex; gap:8px; align-items:center; }
+    .pill {
+      background:#21262d;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 12px;
+      color:var(--muted);
+      font-weight:700;
+    }
+    .timer { font-size: 34px; font-weight: 900; }
+    .timer.low { color: var(--danger); }
+    .mission { text-align:center; margin: 18px 0; }
+    .mission .small { color:var(--muted); }
+    .mission .pair { font-size: clamp(28px, 6vw, 52px); font-weight:900; margin-top:6px; }
+    .arrow { color: var(--accent); padding: 0 8px; }
+    .subtle { color: var(--muted); font-size: 14px; }
+    .metric {
+      background:#0d1117;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+      text-align:center;
+    }
+    .metric strong { display:block; font-size:28px; margin-top:3px; }
+    .good { color: var(--good); }
+    .warn { color: var(--warn); }
+    .screen { display:none; }
+    .screen.active { display:block; }
+    .center { text-align:center; }
+    .bigscore { font-size: clamp(48px, 12vw, 92px); font-weight: 950; margin: 4px 0 0; }
+    .grade { font-size: 30px; font-weight: 900; }
+    .history { margin-top:10px; padding:0; list-style:none; }
+    .history li { padding:10px 0; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:12px;}
+    .detail-card {
+      background:#0d1117;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+      margin-top:12px;
+      text-align:left;
+    }
+    .detail-head {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:10px;
+    }
+    .detail-row {
+      display:grid;
+      grid-template-columns:120px 1fr;
+      gap:10px;
+      padding:6px 0;
+      border-top:1px solid rgba(48,54,61,.55);
+    }
+    .detail-row:first-of-type { border-top:0; }
+    .score-breakdown {
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid var(--line);
+      color:var(--muted);
+      line-height:1.7;
+    }
+    @media (max-width: 640px){
+      .grid.three { grid-template-columns: 1fr 1fr; }
+      .grid.two { grid-template-columns: 1fr; }
+      .card { padding:16px; border-radius:18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">NORIKAE RUSH</div>
+    <div class="tag">最速の乗り換えを見抜け。</div>
+
+    <section id="home" class="screen active">
+      <div class="card hero">
+        <h1>東京の移動力、試してみる？</h1>
+        <p>出発駅から目的駅まで、最適な行き方を4択から選ぶ乗り換えクイズです。</p>
+
+        <div class="card" style="text-align:left;margin-top:4px;">
+          <div style="font-weight:900;font-size:20px;margin-bottom:10px;">遊び方</div>
+          <ol style="margin:0;padding-left:22px;line-height:1.9;">
+            <li>出発駅と目的駅が表示されます。</li>
+            <li>選択肢は4つ。正解は必ず1つだけです。</li>
+            <li>今回のMVPでは、最速ルートが「1回乗り換え」の問題だけ出題します。</li>
+            <li>4つの候補から、最も速く到着できる乗換駅を1つ選びます。</li>
+            <li>制限時間は1問20秒。全5問です。</li>
+            <li>正解・回答時間・遠回り度をもとにスコアを計算します。</li>
+            <li>5問終了後に、各問題の正解・あなたの回答・得点内訳・合計スコア・乗り換え偏差値を確認できます。</li>
+          </ol>
+        </div>
+
+        <button class="primary" onclick="startGame()">5問チャレンジを始める</button>
+        <div class="subtle">※ 出題は2026年8月時点で検証済みの正解マスターからランダムに5問出題します。</div>
+      </div>
+    </section>
+
+    <section id="game" class="screen">
+      <div class="card">
+        <div class="topbar">
+          <div class="pill">QUESTION <span id="qnum">1</span>/5</div>
+          <div class="top-actions">
+            <button class="ghost" onclick="goHome()">トップへ戻る</button>
+            <div id="timer" class="timer">20</div>
+          </div>
+        </div>
+
+        <div class="mission">
+          <div class="small">MISSION</div>
+          <div class="pair"><span id="from"></span><span class="arrow">→</span><span id="to"></span></div>
+        </div>
+
+        <div class="route">出発：<span id="route"></span></div>
+        <div class="subtle" style="margin-top:8px;">最速になる乗換駅を1つ選んでください</div>
+        <div id="choices" class="grid two" style="margin-top:12px;"></div>
+      </div>
+    </section>
+
+    <section id="final" class="screen">
+      <div class="card center">
+        <div class="subtle">TOKYO SCORE</div>
+        <div id="deviation" class="bigscore">東京偏差値 50</div>
+        <div class="subtle" style="margin-top:12px;">総合スコア</div>
+        <div id="totalScore" style="font-size:36px;font-weight:900;margin-top:4px;">0点</div>
+        <div class="subtle" style="margin-top:8px;">5問すべての結果を合計しています</div>
+        <div id="details"></div>
+        <div class="grid two" style="margin-top:14px;">
+          <button class="primary" style="width:100%;" onclick="startGame()">もう一度遊ぶ</button>
+          <button class="ghost" style="width:100%;" onclick="goHome()">トップに戻る</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+<script>
+const correctMaster = [{"question_id": "Q001", "from": "東京", "to": "飯田橋", "transfer": "御茶ノ水", "line1": "JR中央線快速", "line2": "JR中央・総武線各駅停車", "ride_minutes": 8, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E6%9D%B1%E4%BA%AC-%E9%A3%AF%E7%94%B0%E6%A9%8B", "note": "待ち時間を除く乗車時間を基準。御茶ノ水乗換。"}, {"question_id": "Q002", "from": "秋葉原", "to": "赤坂見附", "transfer": "四ツ谷", "line1": "JR中央・総武線各駅停車", "line2": "東京メトロ丸ノ内線", "ride_minutes": 13, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E7%A7%8B%E8%91%89%E5%8E%9F-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "四ツ谷乗換。Yahoo!路線情報で乗車13分。"}, {"question_id": "Q003", "from": "新宿", "to": "日本橋", "transfer": "九段下", "line1": "都営新宿線", "line2": "東京メトロ東西線", "ride_minutes": 13, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E6%96%B0%E5%AE%BF-%E6%97%A5%E6%9C%AC%E6%A9%8B%28%E6%9D%B1%E4%BA%AC%E9%83%BD%29", "note": "九段下乗換。神田乗換14分より短い。"}, {"question_id": "Q004", "from": "目黒", "to": "赤坂見附", "transfer": "渋谷", "line1": "JR山手線", "line2": "東京メトロ銀座線", "ride_minutes": 13, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E7%9B%AE%E9%BB%92-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "渋谷乗換。"}, {"question_id": "Q005", "from": "品川", "to": "赤坂見附", "transfer": "新橋", "line1": "JR東海道本線（上野東京ライン等）", "line2": "東京メトロ銀座線", "ride_minutes": 9, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%93%81%E5%B7%9D-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "新橋乗換。東海道線/横須賀線系統で乗車9分の例あり。"}, {"question_id": "Q006", "from": "川崎", "to": "赤坂見附", "transfer": "新橋", "line1": "JR東海道本線（上野東京ライン）", "line2": "東京メトロ銀座線", "ride_minutes": 19, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%B7%9D%E5%B4%8E-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "新橋乗換。待ち時間を除く最短候補は乗車19分。"}, {"question_id": "Q007", "from": "川崎", "to": "日本橋", "transfer": "新橋", "line1": "JR東海道本線（上野東京ライン）", "line2": "東京メトロ銀座線", "ride_minutes": 20, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%B7%9D%E5%B4%8E-%E6%97%A5%E6%9C%AC%E6%A9%8B%28%E6%9D%B1%E4%BA%AC%E9%83%BD%29", "note": "新橋乗換。都営浅草線利用も同程度だが乗換駅は同じ新橋。"}, {"question_id": "Q008", "from": "池袋", "to": "赤坂見附", "transfer": "新宿三丁目", "line1": "東京メトロ副都心線", "line2": "東京メトロ丸ノ内線", "ride_minutes": 14, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E6%B1%A0%E8%A2%8B-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "丸ノ内線直通（乗換0回）も存在するが乗車26分。新宿三丁目経由の方が短い。"}, {"question_id": "Q009", "from": "大崎", "to": "赤坂見附", "transfer": "渋谷", "line1": "JR山手線", "line2": "東京メトロ銀座線", "ride_minutes": 17, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%A4%A7%E5%B4%8E-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "渋谷乗換。"}, {"question_id": "Q010", "from": "下北沢", "to": "赤坂見附", "transfer": "渋谷", "line1": "京王井の頭線", "line2": "東京メトロ銀座線", "ride_minutes": 14, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E4%B8%8B%E5%8C%97%E6%B2%A2-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "渋谷乗換。"}, {"question_id": "Q011", "from": "吉祥寺", "to": "赤坂見附", "transfer": "四ツ谷", "line1": "JR中央線快速", "line2": "東京メトロ丸ノ内線", "ride_minutes": 21, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%90%89%E7%A5%A5%E5%AF%BA-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "1回乗換候補の乗車時間比較。四ツ谷乗換が最短21分。"}, {"question_id": "Q012", "from": "吉祥寺", "to": "銀座", "transfer": "四ツ谷", "line1": "JR中央線快速", "line2": "東京メトロ丸ノ内線", "ride_minutes": 25, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%90%89%E7%A5%A5%E5%AF%BA-%E9%8A%80%E5%BA%A7", "note": "四ツ谷乗換。待ち時間を除く乗車25分。"}, {"question_id": "Q013", "from": "吉祥寺", "to": "新橋", "transfer": "神田", "line1": "JR中央線快速", "line2": "JR山手線／JR京浜東北線", "ride_minutes": 33, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result?all=1&expkind=1&from=%E5%90%89%E7%A5%A5%E5%AF%BA&s=0&stype=&ticket=ic&to=%E6%96%B0%E6%A9%8B&ws=3", "note": "神田乗換。待ち時間を除く乗車33分の1回乗換ルートを採用。"}, {"question_id": "Q014", "from": "下北沢", "to": "銀座", "transfer": "国会議事堂前", "line1": "小田急小田原線→東京メトロ千代田線（直通）", "line2": "東京メトロ丸ノ内線", "ride_minutes": 19, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E4%B8%8B%E5%8C%97%E6%B2%A2-%E9%8A%80%E5%BA%A7", "note": "到着時刻順では別ルートもあるが、待ち時間除外では国会議事堂前乗換が乗車19分で最短。"}, {"question_id": "Q015", "from": "下北沢", "to": "日本橋", "transfer": "渋谷", "line1": "京王井の頭線", "line2": "東京メトロ銀座線", "ride_minutes": 22, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result?all=1&expkind=1&from=%E4%B8%8B%E5%8C%97%E6%B2%A2&s=2&stype=&ticket=ic&to=%E6%97%A5%E6%9C%AC%E6%A9%8B%28%E6%9D%B1%E4%BA%AC%E9%83%BD%29&ws=3", "note": "渋谷乗換。待ち時間を除く乗車22分。"}, {"question_id": "Q016", "from": "目黒", "to": "銀座", "transfer": "日比谷", "line1": "都営三田線", "line2": "東京メトロ日比谷線", "ride_minutes": 15, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E7%9B%AE%E9%BB%92-%E9%8A%80%E5%BA%A7", "note": "到着時刻順の新橋経由ではなく、待ち時間除外では日比谷乗換が乗車15分で最短。"}, {"question_id": "Q017", "from": "大崎", "to": "銀座", "transfer": "新橋", "line1": "JR山手線", "line2": "東京メトロ銀座線", "ride_minutes": 13, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result?all=1&d=13&expkind=1&fl=1&from=%E5%A4%A7%E5%B4%8E&m=07&ticket=ic&tl=3&to=%E9%8A%80%E5%BA%A7&type=1&y=2026", "note": "新橋乗換。確認できた1回乗換ルートで乗車13分。"}, {"question_id": "Q018", "from": "池袋", "to": "日本橋", "transfer": "大手町", "line1": "東京メトロ丸ノ内線", "line2": "東京メトロ東西線", "ride_minutes": 16, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E6%B1%A0%E8%A2%8B-%E6%97%A5%E6%9C%AC%E6%A9%8B%28%E6%9D%B1%E4%BA%AC%E9%83%BD%29", "note": "大手町乗換。待ち時間を除く乗車16分。"}, {"question_id": "Q019", "from": "赤坂見附", "to": "吉祥寺", "transfer": "四ツ谷", "line1": "東京メトロ丸ノ内線", "line2": "JR中央線快速", "ride_minutes": 23, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84-%E5%90%89%E7%A5%A5%E5%AF%BA", "note": "四ツ谷乗換。待ち時間を除く乗車23分。"}, {"question_id": "Q020", "from": "銀座", "to": "吉祥寺", "transfer": "四ツ谷", "line1": "東京メトロ丸ノ内線", "line2": "JR中央線快速", "ride_minutes": 29, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E9%8A%80%E5%BA%A7-%E5%90%89%E7%A5%A5%E5%AF%BA", "note": "四ツ谷乗換。待ち時間を除く乗車29分。"}];
+let questionPool = [];
+let currentQuestionData = null;
+
+// 主要駅だけに絞った「路線単位」のデータ。
+// 各路線上では、間に表示対象外の駅があっても乗換なしで移動できる。
+// times は、このMVP内での主要駅間の概算所要分（隣接する表示駅同士）。
+const lines = {
+  "JR山手線": {
+    stations: ["池袋","新宿","渋谷","恵比寿","目黒","大崎","品川","新橋","東京","秋葉原","上野"],
+    times:    [8,7,2,3,4,3,8,4,4,4]
+  },
+  "JR埼京線": {
+    stations: ["池袋","新宿","渋谷","大崎"],
+    times:    [5,5,6]
+  },
+  "JR湘南新宿ライン": {
+    stations: ["池袋","新宿","渋谷","大崎","横浜"],
+    times:    [5,5,6,18]
+  },
+  "JR京浜東北線": {
+    stations: ["上野","秋葉原","東京","新橋","品川","川崎","横浜"],
+    times:    [4,4,4,8,9,9]
+  },
+  "JR東海道線": {
+    stations: ["東京","新橋","品川","川崎","横浜"],
+    times:    [3,6,9,8]
+  },
+  "JR中央線快速": {
+    stations: ["東京","御茶ノ水","新宿","中野","吉祥寺"],
+    times:    [4,10,5,11]
+  },
+  "JR中央・総武線": {
+    stations: ["秋葉原","御茶ノ水","飯田橋","市ヶ谷","新宿","中野","吉祥寺"],
+    times:    [2,4,2,6,5,11]
+  },
+
+  // 2026年時点の相互直通運転をゲーム上でも「乗換なし」として扱う。
+  // JR中央・総武線各駅停車 ⇄ 東京メトロ東西線
+  "JR中央・総武線各駅停車 → 東京メトロ東西線（直通）": {
+    stations: ["吉祥寺","中野","飯田橋","大手町","日本橋"],
+    times:    [11,14,6,2]
+  },
+  "東京メトロ銀座線": {
+    stations: ["渋谷","表参道","赤坂見附","新橋","銀座","日本橋","上野"],
+    times:    [2,6,6,3,4,8]
+  },
+  "東京メトロ丸ノ内線": {
+    stations: ["新宿","赤坂見附","銀座","東京","大手町"],
+    times:    [8,6,2,1]
+  },
+  "東京メトロ東西線": {
+    stations: ["中野","飯田橋","大手町","日本橋"],
+    times:    [14,6,2]
+  },
+  "東京メトロ千代田線": {
+    stations: ["代々木上原","表参道","大手町"],
+    times:    [7,12]
+  },
+  "小田急小田原線 → 東京メトロ千代田線（直通）": {
+    stations: ["下北沢","代々木上原","表参道","大手町"],
+    times:    [4,7,12]
+  },
+  "東京メトロ副都心線": {
+    stations: ["池袋","新宿","渋谷"],
+    times:    [6,7]
+  },
+  "東京メトロ副都心線 → 東急東横線（直通）": {
+    stations: ["池袋","新宿","渋谷","横浜"],
+    times:    [6,7,29]
+  },
+  "東京メトロ南北線": {
+    stations: ["目黒","飯田橋"],
+    times:    [15]
+  },
+  "小田急小田原線": {
+    stations: ["新宿","下北沢","代々木上原"],
+    times:    [8,4]
+  },
+  "京王井の頭線": {
+    stations: ["渋谷","下北沢","吉祥寺"],
+    times:    [5,16]
+  }
+};
+
+const stations = [...new Set(Object.values(lines).flatMap(l => l.stations))];
+
+function directOptions(from){
+  const opts = new Map();
+  for(const [lineName, line] of Object.entries(lines)){
+    const i = line.stations.indexOf(from);
+    if(i < 0) continue;
+
+    for(let j=0;j<line.stations.length;j++){
+      if(j === i) continue;
+      const to = line.stations[j];
+      const route = directRouteOnLine(from, to, lineName);
+      if(!route) continue;
+
+      const prev = opts.get(to);
+      if(!prev || route.time < prev.time){
+        opts.set(to, {station:to, line:lineName, time:route.time, route:route.route});
+      }
+    }
+  }
+  return [...opts.values()].sort((a,b)=>a.time-b.time);
+}
+
+function directRouteOnLine(from, to, lineName){
+  const line = lines[lineName];
+  const i = line.stations.indexOf(from);
+  const j = line.stations.indexOf(to);
+  if(i < 0 || j < 0 || i === j) return null;
+
+  const step = i < j ? 1 : -1;
+  const route = [];
+  let time = 0;
+  for(let k=i; ; k += step){
+    route.push(line.stations[k]);
+    if(k === j) break;
+    const tIndex = step === 1 ? k : k-1;
+    time += line.times[tIndex];
+  }
+  return {line:lineName, route, time};
+}
+
+function bestDirectRoute(from, to){
+  const candidates = [];
+  for(const lineName of Object.keys(lines)){
+    const r = directRouteOnLine(from, to, lineName);
+    if(r) candidates.push(r);
+  }
+  if(!candidates.length) return null;
+  candidates.sort((a,b)=>a.time-b.time);
+  return candidates[0];
+}
+
+// 「乗換駅」をノードとした探索。
+// 1回の辺 = 1本の列車・路線で乗換なしに移動可能。
+function shortestTransferRoute(start, goal){
+  // ゲーム仕様：
+  // 出発駅と目的駅の間に「乗換なし」で走る列車・相互直通運転が存在する場合、
+  // 時間帯を問わず、その直通パターンを最速正解として最優先する。
+  const direct = bestDirectRoute(start, goal);
+  if(direct){
+    return {
+      distance: direct.time,
+      route: [start, goal],
+      segments: [{
+        from: start,
+        to: goal,
+        line: direct.line,
+        time: direct.time,
+        route: direct.route
+      }],
+      transfers: 0
+    };
+  }
+
+  const best = {};
+  const prev = {};
+  const prevSeg = {};
+  const queue = [{station:start, time:0, transfers:-1, legs:0}];
+  best[start] = {time:0, transfers:-1, legs:0};
+
+  while(queue.length){
+    queue.sort((a,b) => (a.time-b.time) || (a.transfers-b.transfers));
+    const cur = queue.shift();
+    if(cur.station === goal) break;
+
+    for(const opt of directOptions(cur.station)){
+      const nextTransfers = cur.legs === 0 ? 0 : cur.transfers + 1;
+      const next = {
+        station: opt.station,
+        time: cur.time + opt.time,
+        transfers: nextTransfers,
+        legs: cur.legs + 1
+      };
+
+      const old = best[opt.station];
+      if(!old || next.time < old.time || (next.time === old.time && next.transfers < old.transfers)){
+        best[opt.station] = next;
+        prev[opt.station] = cur.station;
+        prevSeg[opt.station] = opt;
+        queue.push(next);
+      }
+    }
+  }
+
+  if(!best[goal]) return {distance:Infinity, route:[], segments:[], transfers:Infinity};
+
+  const segments = [];
+  let cur = goal;
+  while(cur !== start){
+    const seg = prevSeg[cur];
+    segments.unshift({
+      from: prev[cur],
+      to: cur,
+      line: seg.line,
+      time: seg.time,
+      route: seg.route
+    });
+    cur = prev[cur];
+  }
+
+  const transferStations = [start, ...segments.map(s=>s.to)];
+  return {
+    distance: best[goal].time,
+    route: transferStations,
+    segments,
+    transfers: Math.max(0, segments.length-1)
+  };
+}
+
+function calcChosenRouteTime(p){
+  let total = 0;
+  const segments = [];
+  for(let i=0;i<p.length-1;i++){
+    const r = bestDirectRoute(p[i], p[i+1]);
+    if(!r) return {time:Infinity, segments:[]};
+    total += r.time;
+    segments.push({from:p[i],to:p[i+1],line:r.line,time:r.time,route:r.route});
+  }
+  return {time:total, segments};
+}
+let q = 0;
+let total = 0;
+let currentFrom = "";
+let currentTo = "";
+let path = [];
+let timeLeft = 20;
+let timerId = null;
+let questionStart = 0;
+let records = [];
+let currentCorrect = null;
+let currentOptions = [];
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startGame(){
+  q = 0;
+  total = 0;
+  records = [];
+
+  questionPool = [...correctMaster];
+  for(let i=questionPool.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [questionPool[i], questionPool[j]] = [questionPool[j], questionPool[i]];
+  }
+  questionPool = questionPool.slice(0,5);
+
+  newQuestion();
+}
+
+function newQuestion(){
+  q++;
+  document.getElementById('qnum').textContent = q;
+
+  currentQuestionData = questionPool[q-1];
+  currentFrom = currentQuestionData.from;
+  currentTo = currentQuestionData.to;
+
+  path = [currentFrom];
+  timeLeft = 20;
+  questionStart = Date.now();
+  document.getElementById('from').textContent = currentFrom;
+  document.getElementById('to').textContent = currentTo;
+  document.getElementById('route').textContent = currentFrom;
+  prepareQuestionOptions();
+  renderChoices();
+  show('game');
+
+  clearInterval(timerId);
+  document.getElementById('timer').textContent = timeLeft;
+  document.getElementById('timer').classList.remove('low');
+  timerId = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timer').textContent = timeLeft;
+    if(timeLeft <= 5) document.getElementById('timer').classList.add('low');
+    if(timeLeft <= 0){
+      clearInterval(timerId);
+      path = [currentFrom];
+      finishQuestion(true, false, "時間切れ", Infinity);
+    }
+  }, 1000);
+}
+
+function prepareQuestionOptions(){
+  const correctTransfer = currentQuestionData.transfer;
+
+  currentCorrect = {
+    type: "transfer",
+    label: correctTransfer + "で乗り換え",
+    transfer: correctTransfer
+  };
+
+  const distractors = [];
+  const allTransfers = [...new Set(correctMaster.map(q => q.transfer))]
+    .filter(s => s && s !== correctTransfer && s !== currentFrom && s !== currentTo);
+
+  // まずは、現在の出発駅から一応向かえる駅を優先して誤答候補にする
+  const reachable = directOptions(currentFrom)
+    .map(o => o.station)
+    .filter(s => s !== correctTransfer && s !== currentTo && s !== currentFrom);
+
+  for(const s of reachable){
+    if(distractors.length >= 3) break;
+    if(!distractors.includes(s)) distractors.push(s);
+  }
+
+  // 足りなければ正解マスターに登場する乗換駅から補完
+  const shuffled = [...allTransfers].sort(() => Math.random() - 0.5);
+  for(const s of shuffled){
+    if(distractors.length >= 3) break;
+    if(!distractors.includes(s)) distractors.push(s);
+  }
+
+  currentOptions = [
+    currentCorrect,
+    ...distractors.slice(0,3).map(s => ({
+      type:"transfer",
+      label:s + "で乗り換え",
+      transfer:s
+    }))
+  ];
+
+  for(let i=currentOptions.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [currentOptions[i], currentOptions[j]] = [currentOptions[j], currentOptions[i]];
+  }
+}
+
+function renderChoices(){
+  const box = document.getElementById('choices');
+  box.innerHTML = "";
+
+  currentOptions.forEach((opt, idx) => {
+    const b = document.createElement('button');
+    b.className = 'stationBtn';
+    b.textContent = opt.label;
+    b.onclick = () => answerChoice(idx);
+    box.appendChild(b);
+  });
+}
+
+function answerChoice(index){
+  clearInterval(timerId);
+  const chosen = currentOptions[index];
+  const correct = (
+    chosen.type === currentCorrect.type &&
+    chosen.label === currentCorrect.label
+  );
+
+  let chosenRoute = [currentFrom];
+  let chosenTime = Infinity;
+
+  if(correct){
+    chosenRoute = [currentFrom, currentQuestionData.transfer, currentTo];
+    chosenTime = currentQuestionData.ride_minutes;
+  } else {
+    // 誤答でも目的地までつながる形で表示する。
+    // 既存簡易ネットワークで補完し、組めない場合は回答ラベルだけ記録する。
+    const firstLeg = bestDirectRoute(currentFrom, chosen.transfer);
+    const rest = shortestTransferRoute(chosen.transfer, currentTo);
+    if(firstLeg && Number.isFinite(rest.distance)){
+      chosenRoute = [currentFrom, chosen.transfer, ...rest.route.slice(1)];
+      chosenTime = firstLeg.time + rest.distance;
+    }
+  }
+
+  path = chosenRoute;
+  finishQuestion(false, correct, chosen.label, chosenTime);
+}
+
+function goHome(){
+  clearInterval(timerId);
+  show('home');
+}
+
+function updateRoute(){
+  document.getElementById('route').textContent = path.join(" → ");
+}
+
+function formatSegments(segments){
+  return segments.map(s => `${s.from} → ${s.to}（${s.line}）`).join(" / ");
+}
+
+function formatLineGuide(segments){
+  if(!segments || !segments.length) return "—";
+  return segments.map((s, idx) => {
+    const prefix = idx === 0 ? "" : " → ";
+    return `${prefix}${s.line}［${s.from} → ${s.to}］`;
+  }).join("");
+}
+
+function finishQuestion(timeout, isCorrect=false, answerLabel="", explicitYourTime=null){
+  const best = {
+    distance: currentQuestionData.ride_minutes,
+    route: [currentFrom, currentQuestionData.transfer, currentTo],
+    segments: [
+      {from: currentFrom, to: currentQuestionData.transfer, line: currentQuestionData.line1, time: null, route: [currentFrom, currentQuestionData.transfer]},
+      {from: currentQuestionData.transfer, to: currentTo, line: currentQuestionData.line2, time: null, route: [currentQuestionData.transfer, currentTo]}
+    ]
+  };
+  const chosen = calcChosenRouteTime(path);
+  const your = explicitYourTime !== null ? explicitYourTime : (timeout ? Infinity : chosen.time);
+  const elapsed = Math.min(20, Math.round((Date.now()-questionStart)/1000));
+
+  let score = 0;
+  let baseScore = 0;
+  let timePenalty = 0;
+  let detourPenalty = 0;
+  const diff = Number.isFinite(your) ? Math.max(0, your - best.distance) : null;
+
+  if(timeout){
+    baseScore = 0;
+    score = 0;
+  } else if(isCorrect){
+    baseScore = 10000;
+    timePenalty = elapsed * 50;
+    score = Math.max(0, baseScore - timePenalty);
+  } else if(Number.isFinite(your)){
+    baseScore = 6000;
+    timePenalty = elapsed * 50;
+    detourPenalty = diff * 250;
+    score = Math.max(0, baseScore - timePenalty - detourPenalty);
+  }
+
+  total += score;
+
+  const correctAnswerLabel = currentQuestionData.transfer + "で乗り換え";
+
+  records.push({
+    n:q,
+    from:currentFrom,
+    to:currentTo,
+    score,
+    correct:isCorrect,
+    timeout,
+    answer:answerLabel || (timeout ? "時間切れ" : "未回答"),
+    correctAnswer:correctAnswerLabel,
+    yourRoute:path.slice(),
+    bestRoute:best.route.slice(),
+    bestSegments:best.segments.map(s => ({...s})),
+    yourSegments:chosen.segments.map(s => ({...s})),
+    bestTime:best.distance,
+    yourTime:Number.isFinite(your) ? your : null,
+    elapsed,
+    diff,
+    baseScore,
+    timePenalty,
+    detourPenalty
+  });
+
+  // 1問ごとの結果画面は出さず、そのまま次へ
+  if(q >= 5){
+    showFinal();
+  } else {
+    newQuestion();
+  }
+}
+
+function showFinal(){
+  show('final');
+  document.getElementById('totalScore').textContent = total.toLocaleString() + '点';
+
+  const avg = total/5;
+
+  // 東京偏差値：最低15、最高70。
+  // 0点=15、1問平均10,000点（5問満点50,000点）=70。
+  const dev = Math.round(15 + (avg/10000)*55);
+  document.getElementById('deviation').textContent = "東京偏差値 " + dev;
+
+  const details = document.getElementById('details');
+  details.innerHTML = "";
+
+  records.forEach(r => {
+    const status = r.timeout ? "時間切れ" : (r.correct ? "○ 正解" : "× 不正解");
+    const card = document.createElement('div');
+    card.className = 'detail-card';
+    card.innerHTML = `
+      <div class="detail-head">
+        <div>
+          <div style="font-weight:900;font-size:18px;">Q${r.n} ${r.from} → ${r.to}</div>
+          <div class="subtle">${status}</div>
+        </div>
+        <div style="font-weight:900;font-size:22px;">${r.score.toLocaleString()}点</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="subtle">正解</div>
+        <div><strong>${r.correctAnswer}</strong></div>
+      </div>
+
+      <div class="detail-row">
+        <div class="subtle">あなたの回答</div>
+        <div><strong>${r.answer}</strong></div>
+      </div>
+
+      <div class="detail-row">
+        <div class="subtle">最速ルート</div>
+        <div>${r.bestRoute.join(" → ")}</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="subtle">使う路線</div>
+        <div><strong>${formatLineGuide(r.bestSegments)}</strong></div>
+      </div>
+
+      <div class="detail-row">
+        <div class="subtle">最速所要時間</div>
+        <div><strong>約${r.bestTime}分</strong></div>
+      </div>
+
+
+    `;
+    details.appendChild(card);
+  });
+}
+</script>
+</body>
+</html>
