@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NORIKAE RUSH</title>
+  
+
+<style>
+:root{
+  --navy:#0b1b33;
+  --blue:#2f80ed;
+  --cream:#fff8e8;
+  --cream-border:#f2d88f;
+  --bg:#fafbfc;
+  --card:#fff;
+  --text:#111827;
+  --muted:#667085;
+  --line:#e5e7eb;
+  --shadow:0 8px 24px rgba(17,24,39,.08);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.wrap{
+  width:min(1200px,96vw);
+  margin:0 auto;
+  padding:18px 0 42px;
+}
+.screen{display:none}
+.screen.active{display:block}
+.brand,.tag{display:none}
+
+/* header */
+.app-header{
+  display:grid;
+  grid-template-columns:1.4fr .55fr .55fr .7fr;
+  gap:12px;
+  align-items:stretch;
+  margin-bottom:16px;
+}
+.logo-main{
+  display:flex;
+  align-items:center;
+  font-size:34px;
+  font-weight:950;
+  letter-spacing:-.03em;
+  color:var(--navy);
+}
+.logo-main .rush{color:#ef3340;font-style:italic;margin-left:4px}
+.header-box{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  min-height:82px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+.header-label{font-size:13px;color:#344054;font-weight:800}
+.header-value{font-size:30px;font-weight:950;margin-top:2px}
+.timer-svg-wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.countdown-svg{
+  position:absolute;
+  right:10px;
+  width:56px;height:56px;
+  transform:rotate(-90deg);
+}
+.countdown-track{fill:none;stroke:#eef2f6;stroke-width:5}
+.countdown-progress{
+  fill:none;
+  stroke:#f7c400;
+  stroke-width:5;
+  stroke-linecap:round;
+  stroke-dasharray:131.95;
+  stroke-dashoffset:0;
+  transition:stroke-dashoffset 1s linear;
+}
+.timer-copy{padding-right:28px;text-align:center}
+.timer-sec{font-size:12px;margin-left:3px}
+
+/* common */
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  padding:20px;
+}
+.primary,.ghost,.stationBtn{
+  border:0;
+  border-radius:14px;
+  font-weight:900;
+  cursor:pointer;
+}
+.primary{
+  background:var(--navy);
+  color:white;
+  padding:15px 18px;
+  font-size:17px;
+}
+.ghost{
+  background:white;
+  color:var(--navy);
+  border:1px solid var(--line);
+  padding:13px 16px;
+}
+.subtle{color:var(--muted);font-size:13px}
+
+/* game question */
+.question-card{
+  background:var(--cream);
+  border:1px solid var(--cream-border);
+  border-radius:16px;
+  padding:16px 18px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-bottom:14px;
+}
+.question-badge{
+  background:var(--navy);
+  color:#fff;
+  padding:7px 10px;
+  border-radius:9px;
+  font-size:13px;
+  font-weight:900;
+}
+.question-text{
+  font-size:24px;
+  font-weight:900;
+  line-height:1.35;
+}
+.map-disclaimer{
+  margin:0 0 10px;
+  color:#667085;
+  font-size:12px;
+  font-weight:700;
+  line-height:1.5;
+}
+
+/* map */
+.hint-image-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  padding:14px 16px 18px;
+  margin-bottom:14px;
+}
+.problem-map-wrap{
+  width:100%;
+  position:relative;
+  overflow:hidden;
+  border-radius:14px;
+  background:#fff;
+}
+.problem-map-wrap svg{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:16/9;
+}
+.problem-map-overlay{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+.problem-station-label{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  padding:6px 10px;
+  border-radius:10px;
+  background:#fff;
+  border:2px solid #111;
+  color:#111;
+  font-size:16px;
+  font-weight:950;
+  white-space:nowrap;
+  box-shadow:0 2px 7px rgba(0,0,0,.14);
+}
+
+/* answers */
+#choices{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:12px!important;
+  margin-top:12px!important;
+}
+.stationBtn{
+  min-height:76px!important;
+  background:white!important;
+  color:var(--text)!important;
+  border:1px solid var(--line)!important;
+  box-shadow:var(--shadow);
+  padding:16px 16px 16px 76px!important;
+  font-size:20px!important;
+  text-align:left;
+  position:relative;
+}
+.stationBtn::before{
+  content:attr(data-letter);
+  position:absolute;
+  left:20px;
+  top:50%;
+  transform:translateY(-50%);
+  width:42px;height:42px;border-radius:50%;
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:950;
+}
+.stationBtn[data-letter="A"]::before{background:#e63946}
+.stationBtn[data-letter="B"]::before{background:#2f80ed}
+.stationBtn[data-letter="C"]::before{background:#10a36a}
+.stationBtn[data-letter="D"]::before{background:#ff9800}
+.answer-help{text-align:center;color:#667085;font-size:12px;margin-top:12px}
+
+/* home */
+.hero{text-align:center;padding:28px}
+.hero h1{font-size:36px;margin:0 0 10px}
+.hero p{color:#667085;font-size:17px}
+.howto{
+  margin:20px 0;
+  text-align:left;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:18px;
+  background:#fff;
+}
+.howto h3{margin:0 0 8px}
+.howto ol{margin:0;padding-left:22px;line-height:1.8}
+
+/* final */
+.final-hero{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  text-align:center;
+  padding:24px;
+}
+.final-kicker{font-size:13px;color:#667085;font-weight:800}
+#deviation{font-size:60px;font-weight:950;color:var(--navy);margin:4px 0}
+.total-label{font-size:13px;color:#667085}
+#totalScore{font-size:32px!important;font-weight:950!important}
+.detail-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:16px;
+  margin-top:12px;
+}
+.detail-card,
+.detail-card *{font-weight:800!important}
+.detail-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px}
+.detail-row{
+  display:grid;
+  grid-template-columns:120px 1fr;
+  gap:10px;
+  padding:7px 0;
+  border-top:1px solid #eef0f2;
+}
+.final-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+
+.top-return{
+  background:white;
+  color:var(--navy);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px 12px;
+  font-weight:800;
+  cursor:pointer;
+  margin-bottom:10px;
+}
+
+@media(max-width:760px){
+  .wrap{width:min(100%,760px);padding:8px 8px 24px}
+  .app-header{
+    grid-template-columns:1.1fr .62fr .62fr .8fr;
+    gap:5px;
+    margin-bottom:10px;
+  }
+  .logo-main{font-size:21px}
+  .header-box{min-height:62px;border-radius:12px}
+  .header-label{font-size:9px}
+  .header-value{font-size:20px}
+  .countdown-svg{width:42px;height:42px;right:3px}
+  .timer-copy{padding-right:20px}
+  .question-card{padding:11px 12px;gap:8px}
+  .question-badge{font-size:10px;padding:5px 7px}
+  .question-text{font-size:15px}
+  .hint-image-card{padding:9px 9px 11px}
+  .problem-map-wrap svg{aspect-ratio:16/9}
+  .problem-station-label{font-size:13px;padding:4px 7px;border-width:2px}
+  #choices{grid-template-columns:1fr!important;gap:9px!important}
+  .stationBtn{min-height:68px!important;font-size:18px!important;padding-left:72px!important}
+  .stationBtn::before{width:40px;height:40px;left:18px}
+  #deviation{font-size:46px}
+  .final-actions{grid-template-columns:1fr}
+}
+</style>
+
+
+</head>
+<body>
+  <div class="wrap">
+
+    
+    <div class="app-header" id="appHeader">
+      <div class="logo-main">乗り換え<span class="rush">RUSH</span></div>
+      <div class="header-box">
+        <div class="header-label">問題</div>
+        <div class="header-value"><span id="headerQ">1</span>/5</div>
+      </div>
+      <div class="header-box">
+        <div class="header-label">スコア</div>
+        <div class="header-value" id="headerScore">0</div>
+      </div>
+      <div class="header-box">
+        <div class="timer-svg-wrap">
+          <svg viewBox="0 0 52 52" class="countdown-svg">
+            <circle cx="26" cy="26" r="21" class="countdown-track"></circle>
+            <circle cx="26" cy="26" r="21" class="countdown-progress" id="timerProgress"></circle>
+          </svg>
+          <div class="timer-copy">
+            <div class="header-label">残り時間</div>
+            <div class="header-value"><span id="headerTimer">20</span><span class="timer-sec">秒</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+<section id="home" class="screen active">
+  <div class="home-panel">
+    <div class="card hero">
+      <h1>東京の移動力、試してみる？</h1>
+      <p>最速の乗換駅を4択から選ぶ、東京乗り換えクイズ。</p>
+      <div class="howto">
+        <h3>遊び方</h3>
+        <ol>
+          <li>出発駅と目的駅が表示されます。</li>
+          <li>今回のMVPでは、最速ルートが1回乗り換えの問題だけ出題します。</li>
+          <li>4つの候補から、最も速く到着できる乗換駅を1つ選びます。</li>
+          <li>制限時間は1問20秒、全5問です。</li>
+          <li>5問終了後に東京偏差値と各問題の結果を確認できます。</li>
+        </ol>
+      </div>
+      <button class="primary" style="width:100%;" onclick="startGame()">5問チャレンジを始める</button>
+      <div class="subtle" style="margin-top:12px;">※ 出題は2026年8月時点で検証済みの正解マスターを使用しています。</div>
+    </div>
+  </div>
+</section>
+
+
+    
+<section id="game" class="screen">
+  <button class="top-return" onclick="goHome()">トップへ戻る</button>
+
+  <div class="question-card">
+    <div class="question-badge">問題</div>
+    <div class="question-text"><span id="from"></span>駅から<span id="to"></span>駅まで、最速になる乗換駅はどれ？</div>
+  </div>
+
+  <div class="hint-image-card">
+    <div class="map-disclaimer">※このマップは位置関係を分かりやすくするために簡略化した図です。実際の駅・路線の位置とはずれる場合があります。</div>
+    <div class="problem-map-wrap"><svg class="hint-map-img" viewBox="0 0 1536 1024" xmlns="http://www.w3.org/2000/svg" aria-label="東京の簡略路線図">
+<rect width="1536" height="1024" fill="white"/>
+<g fill="none" stroke-linecap="round" stroke-linejoin="round">
+<ellipse cx="700" cy="500" rx="355" ry="335" stroke="#2ca01c" stroke-width="12"/>
+<polyline points="95,205 245,205 320,255 520,255 610,310 1005,310 1140,185 1260,185" stroke="#e51c23" stroke-width="9"/>
+<polyline points="70,335 250,335 350,390 610,390 760,450 1050,450 1250,535" stroke="#f28c00" stroke-width="9"/>
+<polyline points="65,300 255,300 385,380 620,380 820,560 1110,575 1320,575" stroke="#159bd7" stroke-width="9"/>
+<polyline points="75,500 260,500 390,570 620,570 850,670 1160,670" stroke="#ec2c77" stroke-width="9"/>
+<polyline points="70,650 250,650 400,520 650,520 850,585 1160,585 1310,585" stroke="#009688" stroke-width="9"/>
+<polyline points="250,820 500,820 650,700 820,700 930,590 1080,390 1260,390" stroke="#7b2cbf" stroke-width="9"/>
+<polyline points="90,760 390,760 610,760 750,650 950,650 1120,520 1290,320" stroke="#194fb7" stroke-width="9"/>
+<polyline points="430,100 430,220 650,220 760,300 760,560 620,690 330,690" stroke="#737373" stroke-width="9"/>
+<polyline points="980,110 980,290 980,510 980,690 1150,820" stroke="#ffc400" stroke-width="9"/>
+</g>
+<ellipse cx="700" cy="500" rx="105" ry="90" fill="#dce8b9" stroke="#e6eef4" stroke-width="12"/>
+</svg><div class="problem-map-overlay"><div id="mapFromOnly" class="problem-station-label"></div><div id="mapToOnly" class="problem-station-label"></div></div></div>
+  </div>
+
+  <div id="route" style="display:none;"></div>
+  <div id="choices"></div>
+  <div class="answer-help">正解だと思う選択肢をタップしてください</div>
+
+  <div style="display:none;">
+    <span id="qnum">1</span>
+    <span id="timer">20</span>
+  </div>
+</section>
+
+
+    
+<section id="final" class="screen">
+  <div class="final-wrap">
+    <div class="final-hero">
+      <div class="final-kicker">TOKYO SCORE</div>
+      <div id="deviation">東京偏差値 50</div>
+      <div class="total-label">総合スコア</div>
+      <div id="totalScore">0点</div>
+      <div class="subtle" style="margin-top:8px;">5問すべての結果を合計しています</div>
+    </div>
+
+    <div id="details" style="margin-top:16px;"></div>
+
+    <div class="final-actions">
+      <button class="primary" onclick="startGame()">もう一度遊ぶ</button>
+      <button class="ghost" onclick="goHome()">トップに戻る</button>
+    </div>
+  </div>
+</section>
+
+  </div>
+
+<script>
+const correctMaster = [{"question_id": "Q001", "from": "東京", "to": "飯田橋", "transfer": "御茶ノ水", "line1": "JR中央線快速", "line2": "JR中央・総武線各駅停車", "ride_minutes": 8, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E6%9D%B1%E4%BA%AC-%E9%A3%AF%E7%94%B0%E6%A9%8B", "note": "待ち時間を除く乗車時間を基準。御茶ノ水乗換。", "hint_map_file": "Q001_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5p2x5Lqs44GL44KJ6aOv55Sw5qmL44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjEzOC41IiBjeT0iMjQuNiIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTM4LjUiIHk9IjIwLjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuadseS6rDwvdGV4dD48L2c+PGc+PGNpcmNsZSBjeD0iMTI0LjQiIGN5PSIxOC40IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSIxMjQuNCIgeT0iMTQuNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2LjIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+6aOv55Sw5qmLPC90ZXh0PjwvZz48L3N2Zz4="}, {"question_id": "Q002", "from": "秋葉原", "to": "赤坂見附", "transfer": "四ツ谷", "line1": "JR中央・総武線各駅停車", "line2": "東京メトロ丸ノ内線", "ride_minutes": 13, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E7%A7%8B%E8%91%89%E5%8E%9F-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "四ツ谷乗換。Yahoo!路線情報で乗車13分。", "hint_map_file": "Q002_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i56eL6JGJ5Y6f44GL44KJ6LWk5Z2C6KaL6ZmE44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjE0Mi4zIiBjeT0iMTkuNSIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTQyLjMiIHk9IjE1LjUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPueni+iRieWOnzwvdGV4dD48L2c+PGc+PGNpcmNsZSBjeD0iMTE5LjQiIGN5PSIyNS45IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSIxMTkuNCIgeT0iMjEuOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2LjIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+6LWk5Z2C6KaL6ZmEPC90ZXh0PjwvZz48L3N2Zz4="}, {"question_id": "Q003", "from": "新宿", "to": "日本橋", "transfer": "九段下", "line1": "都営新宿線", "line2": "東京メトロ東西線", "ride_minutes": 13, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E6%96%B0%E5%AE%BF-%E6%97%A5%E6%9C%AC%E6%A9%8B%28%E6%9D%B1%E4%BA%AC%E9%83%BD%29", "note": "九段下乗換。神田乗換14分より短い。", "hint_map_file": "Q003_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5paw5a6/44GL44KJ5pel5pys5qmL44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9Ijk2LjMiIGN5PSIyMi4wIiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSI5Ni4zIiB5PSIxOC4wIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYuMiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj7mlrDlrr88L3RleHQ+PC9nPjxnPjxjaXJjbGUgY3g9IjE0My4xIiBjeT0iMjQuMiIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTQzLjEiIHk9IjIwLjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuaXpeacrOapizwvdGV4dD48L2c+PC9zdmc+"}, {"question_id": "Q004", "from": "目黒", "to": "赤坂見附", "transfer": "渋谷", "line1": "JR山手線", "line2": "東京メトロ銀座線", "ride_minutes": 13, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E7%9B%AE%E9%BB%92-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "渋谷乗換。", "hint_map_file": "Q004_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i55uu6buS44GL44KJ6LWk5Z2C6KaL6ZmE44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjEwNS44IiBjeT0iMzguOCIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTA1LjgiIHk9IjM0LjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuebrum7kjwvdGV4dD48L2c+PGc+PGNpcmNsZSBjeD0iMTE5LjQiIGN5PSIyNS45IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSIxMTkuNCIgeT0iMjEuOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2LjIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+6LWk5Z2C6KaL6ZmEPC90ZXh0PjwvZz48L3N2Zz4="}, {"question_id": "Q005", "from": "品川", "to": "赤坂見附", "transfer": "新橋", "line1": "JR東海道本線（上野東京ライン等）", "line2": "東京メトロ銀座線", "ride_minutes": 9, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%93%81%E5%B7%9D-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "新橋乗換。東海道線/横須賀線系統で乗車9分の例あり。", "hint_map_file": "Q005_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5ZOB5bed44GL44KJ6LWk5Z2C6KaL6ZmE44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjEyMC41IiBjeT0iNDAuNSIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTIwLjUiIHk9IjM2LjUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuWTgeW3nTwvdGV4dD48L2c+PGc+PGNpcmNsZSBjeD0iMTE5LjQiIGN5PSIyNS45IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSIxMTkuNCIgeT0iMjEuOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2LjIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+6LWk5Z2C6KaL6ZmEPC90ZXh0PjwvZz48L3N2Zz4="}, {"question_id": "Q006", "from": "川崎", "to": "赤坂見附", "transfer": "新橋", "line1": "JR東海道本線（上野東京ライン）", "line2": "東京メトロ銀座線", "ride_minutes": 19, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%B7%9D%E5%B4%8E-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "新橋乗換。待ち時間を除く最短候補は乗車19分。", "hint_map_file": "Q006_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5bed5bSO44GL44KJ6LWk5Z2C6KaL6ZmE44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjkzLjgiIGN5PSI2OS42IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSI5My44IiB5PSI2NS42IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYuMiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj7lt53ltI48L3RleHQ+PC9nPjxnPjxjaXJjbGUgY3g9IjExOS40IiBjeT0iMjUuOSIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTE5LjQiIHk9IjIxLjkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPui1pOWdguimi+mZhDwvdGV4dD48L2c+PC9zdmc+"}, {"question_id": "Q007", "from": "川崎", "to": "日本橋", "transfer": "新橋", "line1": "JR東海道本線（上野東京ライン）", "line2": "東京メトロ銀座線", "ride_minutes": 20, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%B7%9D%E5%B4%8E-%E6%97%A5%E6%9C%AC%E6%A9%8B%28%E6%9D%B1%E4%BA%AC%E9%83%BD%29", "note": "新橋乗換。都営浅草線利用も同程度だが乗換駅は同じ新橋。", "hint_map_file": "Q007_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5bed5bSO44GL44KJ5pel5pys5qmL44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjkzLjgiIGN5PSI2OS42IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSI5My44IiB5PSI2NS42IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYuMiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj7lt53ltI48L3RleHQ+PC9nPjxnPjxjaXJjbGUgY3g9IjE0My4xIiBjeT0iMjQuMiIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTQzLjEiIHk9IjIwLjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuaXpeacrOapizwvdGV4dD48L2c+PC9zdmc+"}, {"question_id": "Q008", "from": "池袋", "to": "赤坂見附", "transfer": "新宿三丁目", "line1": "東京メトロ副都心線", "line2": "東京メトロ丸ノ内線", "ride_minutes": 14, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E6%B1%A0%E8%A2%8B-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "丸ノ内線直通（乗換0回）も存在するが乗車26分。新宿三丁目経由の方が短い。", "hint_map_file": "Q008_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5rGg6KKL44GL44KJ6LWk5Z2C6KaL6ZmE44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjEwMi44IiBjeT0iMTAuMiIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTAyLjgiIHk9IjYuMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2LjIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+5rGg6KKLPC90ZXh0PjwvZz48Zz48Y2lyY2xlIGN4PSIxMTkuNCIgY3k9IjI1LjkiIHI9IjIuMSIgZmlsbD0iIzExMSIvPjx0ZXh0IHg9IjExOS40IiB5PSIyMS45IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYuMiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj7otaTlnYLopovpmYQ8L3RleHQ+PC9nPjwvc3ZnPg=="}, {"question_id": "Q009", "from": "大崎", "to": "赤坂見附", "transfer": "渋谷", "line1": "JR山手線", "line2": "東京メトロ銀座線", "ride_minutes": 17, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%A4%A7%E5%B4%8E-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "渋谷乗換。", "hint_map_file": "Q009_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5aSn5bSO44GL44KJ6LWk5Z2C6KaL6ZmE44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjExNC4wIiBjeT0iNDMuMSIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTE0LjAiIHk9IjM5LjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuWkp+W0jjwvdGV4dD48L2c+PGc+PGNpcmNsZSBjeD0iMTE5LjQiIGN5PSIyNS45IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSIxMTkuNCIgeT0iMjEuOSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2LjIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+6LWk5Z2C6KaL6ZmEPC90ZXh0PjwvZz48L3N2Zz4="}, {"question_id": "Q010", "from": "下北沢", "to": "赤坂見附", "transfer": "渋谷", "line1": "京王井の頭線", "line2": "東京メトロ銀座線", "ride_minutes": 14, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E4%B8%8B%E5%8C%97%E6%B2%A2-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "渋谷乗換。", "hint_map_file": "Q010_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5LiL5YyX5rKi44GL44KJ6LWk5Z2C6KaL6ZmE44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9Ijc0LjciIGN5PSIzMC41IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSI3NC43IiB5PSIyNi41IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYuMiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj7kuIvljJfmsqI8L3RleHQ+PC9nPjxnPjxjaXJjbGUgY3g9IjExOS40IiBjeT0iMjUuOSIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTE5LjQiIHk9IjIxLjkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPui1pOWdguimi+mZhDwvdGV4dD48L2c+PC9zdmc+"}, {"question_id": "Q011", "from": "吉祥寺", "to": "赤坂見附", "transfer": "四ツ谷", "line1": "JR中央線快速", "line2": "東京メトロ丸ノ内線", "ride_minutes": 21, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%90%89%E7%A5%A5%E5%AF%BA-%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84", "note": "1回乗換候補の乗車時間比較。四ツ谷乗換が最短21分。", "hint_map_file": "Q011_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5ZCJ56Wl5a+644GL44KJ6LWk5Z2C6KaL6ZmE44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjE5LjYiIGN5PSIxOC4xIiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSIxOS42IiB5PSIxNC4xIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYuMiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj7lkInnpaXlr7o8L3RleHQ+PC9nPjxnPjxjaXJjbGUgY3g9IjExOS40IiBjeT0iMjUuOSIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTE5LjQiIHk9IjIxLjkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPui1pOWdguimi+mZhDwvdGV4dD48L2c+PC9zdmc+"}, {"question_id": "Q012", "from": "吉祥寺", "to": "銀座", "transfer": "四ツ谷", "line1": "JR中央線快速", "line2": "東京メトロ丸ノ内線", "ride_minutes": 25, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E5%90%89%E7%A5%A5%E5%AF%BA-%E9%8A%80%E5%BA%A7", "note": "四ツ谷乗換。待ち時間を除く乗車25分。", "hint_map_file": "Q012_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5ZCJ56Wl5a+644GL44KJ6YqA5bqn44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjE5LjYiIGN5PSIxOC4xIiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSIxOS42IiB5PSIxNC4xIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYuMiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj7lkInnpaXlr7o8L3RleHQ+PC9nPjxnPjxjaXJjbGUgY3g9IjEzNy4xIiBjeT0iMjcuNCIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTM3LjEiIHk9IjIzLjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPumKgOW6pzwvdGV4dD48L2c+PC9zdmc+"}, {"question_id": "Q013", "from": "吉祥寺", "to": "新橋", "transfer": "神田", "line1": "JR中央線快速", "line2": "JR山手線／JR京浜東北線", "ride_minutes": 33, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result?all=1&expkind=1&from=%E5%90%89%E7%A5%A5%E5%AF%BA&s=0&stype=&ticket=ic&to=%E6%96%B0%E6%A9%8B&ws=3", "note": "神田乗換。待ち時間を除く乗車33分の1回乗換ルートを採用。", "hint_map_file": "Q013_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5ZCJ56Wl5a+644GL44KJ5paw5qmL44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjE5LjYiIGN5PSIxOC4xIiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSIxOS42IiB5PSIxNC4xIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYuMiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj7lkInnpaXlr7o8L3RleHQ+PC9nPjxnPjxjaXJjbGUgY3g9IjEzMy4xIiBjeT0iMjkuMSIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTMzLjEiIHk9IjI1LjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuaWsOapizwvdGV4dD48L2c+PC9zdmc+"}, {"question_id": "Q014", "from": "下北沢", "to": "銀座", "transfer": "国会議事堂前", "line1": "小田急小田原線→東京メトロ千代田線（直通）", "line2": "東京メトロ丸ノ内線", "ride_minutes": 19, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E4%B8%8B%E5%8C%97%E6%B2%A2-%E9%8A%80%E5%BA%A7", "note": "到着時刻順では別ルートもあるが、待ち時間除外では国会議事堂前乗換が乗車19分で最短。", "hint_map_file": "Q014_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5LiL5YyX5rKi44GL44KJ6YqA5bqn44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9Ijc0LjciIGN5PSIzMC41IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSI3NC43IiB5PSIyNi41IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYuMiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj7kuIvljJfmsqI8L3RleHQ+PC9nPjxnPjxjaXJjbGUgY3g9IjEzNy4xIiBjeT0iMjcuNCIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTM3LjEiIHk9IjIzLjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPumKgOW6pzwvdGV4dD48L2c+PC9zdmc+"}, {"question_id": "Q015", "from": "下北沢", "to": "日本橋", "transfer": "渋谷", "line1": "京王井の頭線", "line2": "東京メトロ銀座線", "ride_minutes": 22, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result?all=1&expkind=1&from=%E4%B8%8B%E5%8C%97%E6%B2%A2&s=2&stype=&ticket=ic&to=%E6%97%A5%E6%9C%AC%E6%A9%8B%28%E6%9D%B1%E4%BA%AC%E9%83%BD%29&ws=3", "note": "渋谷乗換。待ち時間を除く乗車22分。", "hint_map_file": "Q015_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5LiL5YyX5rKi44GL44KJ5pel5pys5qmL44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9Ijc0LjciIGN5PSIzMC41IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSI3NC43IiB5PSIyNi41IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYuMiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj7kuIvljJfmsqI8L3RleHQ+PC9nPjxnPjxjaXJjbGUgY3g9IjE0My4xIiBjeT0iMjQuMiIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTQzLjEiIHk9IjIwLjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuaXpeacrOapizwvdGV4dD48L2c+PC9zdmc+"}, {"question_id": "Q016", "from": "目黒", "to": "銀座", "transfer": "日比谷", "line1": "都営三田線", "line2": "東京メトロ日比谷線", "ride_minutes": 15, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E7%9B%AE%E9%BB%92-%E9%8A%80%E5%BA%A7", "note": "到着時刻順の新橋経由ではなく、待ち時間除外では日比谷乗換が乗車15分で最短。", "hint_map_file": "Q016_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i55uu6buS44GL44KJ6YqA5bqn44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjEwNS44IiBjeT0iMzguOCIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTA1LjgiIHk9IjM0LjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuebrum7kjwvdGV4dD48L2c+PGc+PGNpcmNsZSBjeD0iMTM3LjEiIGN5PSIyNy40IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSIxMzcuMSIgeT0iMjMuNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2LjIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+6YqA5bqnPC90ZXh0PjwvZz48L3N2Zz4="}, {"question_id": "Q017", "from": "大崎", "to": "銀座", "transfer": "新橋", "line1": "JR山手線", "line2": "東京メトロ銀座線", "ride_minutes": 13, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result?all=1&d=13&expkind=1&fl=1&from=%E5%A4%A7%E5%B4%8E&m=07&ticket=ic&tl=3&to=%E9%8A%80%E5%BA%A7&type=1&y=2026", "note": "新橋乗換。確認できた1回乗換ルートで乗車13分。", "hint_map_file": "Q017_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5aSn5bSO44GL44KJ6YqA5bqn44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjExNC4wIiBjeT0iNDMuMSIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTE0LjAiIHk9IjM5LjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuWkp+W0jjwvdGV4dD48L2c+PGc+PGNpcmNsZSBjeD0iMTM3LjEiIGN5PSIyNy40IiByPSIyLjEiIGZpbGw9IiMxMTEiLz48dGV4dCB4PSIxMzcuMSIgeT0iMjMuNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2LjIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+6YqA5bqnPC90ZXh0PjwvZz48L3N2Zz4="}, {"question_id": "Q018", "from": "池袋", "to": "日本橋", "transfer": "大手町", "line1": "東京メトロ丸ノ内線", "line2": "東京メトロ東西線", "ride_minutes": 16, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E6%B1%A0%E8%A2%8B-%E6%97%A5%E6%9C%AC%E6%A9%8B%28%E6%9D%B1%E4%BA%AC%E9%83%BD%29", "note": "大手町乗換。待ち時間を除く乗車16分。", "hint_map_file": "Q018_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i5rGg6KKL44GL44KJ5pel5pys5qmL44Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjEwMi44IiBjeT0iMTAuMiIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTAyLjgiIHk9IjYuMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSI2LjIiIGZvbnQtd2VpZ2h0PSI5MDAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBwYWludC1vcmRlcj0ic3Ryb2tlIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+5rGg6KKLPC90ZXh0PjwvZz48Zz48Y2lyY2xlIGN4PSIxNDMuMSIgY3k9IjI0LjIiIHI9IjIuMSIgZmlsbD0iIzExMSIvPjx0ZXh0IHg9IjE0My4xIiB5PSIyMC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjYuMiIgZm9udC13ZWlnaHQ9IjkwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIHBhaW50LW9yZGVyPSJzdHJva2UiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj7ml6XmnKzmqYs8L3RleHQ+PC9nPjwvc3ZnPg=="}, {"question_id": "Q019", "from": "赤坂見附", "to": "吉祥寺", "transfer": "四ツ谷", "line1": "東京メトロ丸ノ内線", "line2": "JR中央線快速", "ride_minutes": 23, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E8%B5%A4%E5%9D%82%E8%A6%8B%E9%99%84-%E5%90%89%E7%A5%A5%E5%AF%BA", "note": "四ツ谷乗換。待ち時間を除く乗車23分。", "hint_map_file": "Q019_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i6LWk5Z2C6KaL6ZmE44GL44KJ5ZCJ56Wl5a+644Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjExOS40IiBjeT0iMjUuOSIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTE5LjQiIHk9IjIxLjkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPui1pOWdguimi+mZhDwvdGV4dD48L2c+PGc+PGNpcmNsZSBjeD0iMTkuNiIgY3k9IjE4LjEiIHI9IjIuMSIgZmlsbD0iIzExMSIvPjx0ZXh0IHg9IjE5LjYiIHk9IjE0LjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuWQieelpeWvujwvdGV4dD48L2c+PC9zdmc+"}, {"question_id": "Q020", "from": "銀座", "to": "吉祥寺", "transfer": "四ツ谷", "line1": "東京メトロ丸ノ内線", "line2": "JR中央線快速", "ride_minutes": 29, "transfer_count": 1, "status": "検証済み", "source_date": "2026-08", "source_url": "https://transit.yahoo.co.jp/search/result/%E9%8A%80%E5%BA%A7-%E5%90%89%E7%A5%A5%E5%AF%BA", "note": "四ツ谷乗換。待ち時間を除く乗車29分。", "hint_map_file": "Q020_wide_geo.svg", "hint_map_data_uri": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNjAgODAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0i6YqA5bqn44GL44KJ5ZCJ56Wl5a+644Gu5qaC55Wl6Lev57ea5ZuzIj48cmVjdCB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZmZmIi8+PHBvbHlsaW5lIHBvaW50cz0iMywxNyAyNSwxNyA0MCwyNSA2MywyNSA3OSwzNiAxMTksMzYgMTU2LDQzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTFjMjMiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCwyOCAyNSwyOCA0NCwzNSA3MSwzNSA5Miw0MiAxMjksNDIgMTU2LDU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmMjhjMDAiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMywyMyAyNywyMyA0NiwzNCA3MSwzNCA5Niw0OSAxMjksNTIgMTU2LDUyIiBmaWxsPSJub25lIiBzdHJva2U9IiMxNmE4ZGYiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw0NSAyOCw0NSA0Nyw1MyA3Miw1MyA5Nyw2MiAxMzIsNjIgMTU2LDYyIiBmaWxsPSJub25lIiBzdHJva2U9IiNlYzJjNzciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNCw1OSAyNyw1OSA0OCw0NSA3NSw0NSA5OCw0OSAxMzIsNDkgMTU2LDQ5IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDk2ODgiIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMjIsNzIgNTUsNzIgNzcsNjAgOTYsNjAgMTA4LDUwIDEyMSwzNCAxNDQsMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmNiZiIgc3Ryb2tlLXdpZHRoPSIyLjE1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cG9seWxpbmUgcG9pbnRzPSI3LDY3IDQ4LDY3IDczLDY3IDg4LDU3IDEwOCw1NyAxMzAsNDYgMTQ2LDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMxOTRmYjciIHN0cm9rZS13aWR0aD0iMi4xNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iNDUsNiA0NSwxNSA3NywxNSA4NiwyNCA4Niw0NyA3MCw1NyAzOSw1NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzM3MzczIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwb2x5bGluZSBwb2ludHM9IjExMiw3IDExMiwyMyAxMTIsNDAgMTEyLDUzIDEzMiw2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjNDAwIiBzdHJva2Utd2lkdGg9IjIuMTUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxlbGxpcHNlIGN4PSI4NiIgY3k9IjM5IiByeD0iMzgiIHJ5PSIyNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTVhNjMwIiBzdHJva2Utd2lkdGg9IjIuNyIvPjxnPjxjaXJjbGUgY3g9IjEzNy4xIiBjeT0iMjcuNCIgcj0iMi4xIiBmaWxsPSIjMTExIi8+PHRleHQgeD0iMTM3LjEiIHk9IjIzLjQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPumKgOW6pzwvdGV4dD48L2c+PGc+PGNpcmNsZSBjeD0iMTkuNiIgY3k9IjE4LjEiIHI9IjIuMSIgZmlsbD0iIzExMSIvPjx0ZXh0IHg9IjE5LjYiIHk9IjE0LjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNi4yIiBmb250LXdlaWdodD0iOTAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgcGFpbnQtb3JkZXI9InN0cm9rZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPuWQieelpeWvujwvdGV4dD48L2c+PC9zdmc+"}];
+let questionPool = [];
+let currentQuestionData = null;
+
+// 主要駅だけに絞った「路線単位」のデータ。
+// 各路線上では、間に表示対象外の駅があっても乗換なしで移動できる。
+// times は、このMVP内での主要駅間の概算所要分（隣接する表示駅同士）。
+const lines = {
+  "JR山手線": {
+    stations: ["池袋","新宿","渋谷","恵比寿","目黒","大崎","品川","新橋","東京","秋葉原","上野"],
+    times:    [8,7,2,3,4,3,8,4,4,4]
+  },
+  "JR埼京線": {
+    stations: ["池袋","新宿","渋谷","大崎"],
+    times:    [5,5,6]
+  },
+  "JR湘南新宿ライン": {
+    stations: ["池袋","新宿","渋谷","大崎","横浜"],
+    times:    [5,5,6,18]
+  },
+  "JR京浜東北線": {
+    stations: ["上野","秋葉原","東京","新橋","品川","川崎","横浜"],
+    times:    [4,4,4,8,9,9]
+  },
+  "JR東海道線": {
+    stations: ["東京","新橋","品川","川崎","横浜"],
+    times:    [3,6,9,8]
+  },
+  "JR中央線快速": {
+    stations: ["東京","御茶ノ水","新宿","中野","吉祥寺"],
+    times:    [4,10,5,11]
+  },
+  "JR中央・総武線": {
+    stations: ["秋葉原","御茶ノ水","飯田橋","市ヶ谷","新宿","中野","吉祥寺"],
+    times:    [2,4,2,6,5,11]
+  },
+
+  // 2026年時点の相互直通運転をゲーム上でも「乗換なし」として扱う。
+  // JR中央・総武線各駅停車 ⇄ 東京メトロ東西線
+  "JR中央・総武線各駅停車 → 東京メトロ東西線（直通）": {
+    stations: ["吉祥寺","中野","飯田橋","大手町","日本橋"],
+    times:    [11,14,6,2]
+  },
+  "東京メトロ銀座線": {
+    stations: ["渋谷","表参道","赤坂見附","新橋","銀座","日本橋","上野"],
+    times:    [2,6,6,3,4,8]
+  },
+  "東京メトロ丸ノ内線": {
+    stations: ["新宿","赤坂見附","銀座","東京","大手町"],
+    times:    [8,6,2,1]
+  },
+  "東京メトロ東西線": {
+    stations: ["中野","飯田橋","大手町","日本橋"],
+    times:    [14,6,2]
+  },
+  "東京メトロ千代田線": {
+    stations: ["代々木上原","表参道","大手町"],
+    times:    [7,12]
+  },
+  "小田急小田原線 → 東京メトロ千代田線（直通）": {
+    stations: ["下北沢","代々木上原","表参道","大手町"],
+    times:    [4,7,12]
+  },
+  "東京メトロ副都心線": {
+    stations: ["池袋","新宿","渋谷"],
+    times:    [6,7]
+  },
+  "東京メトロ副都心線 → 東急東横線（直通）": {
+    stations: ["池袋","新宿","渋谷","横浜"],
+    times:    [6,7,29]
+  },
+  "東京メトロ南北線": {
+    stations: ["目黒","飯田橋"],
+    times:    [15]
+  },
+  "小田急小田原線": {
+    stations: ["新宿","下北沢","代々木上原"],
+    times:    [8,4]
+  },
+  "京王井の頭線": {
+    stations: ["渋谷","下北沢","吉祥寺"],
+    times:    [5,16]
+  }
+};
+
+const stations = [...new Set(Object.values(lines).flatMap(l => l.stations))];
+
+function directOptions(from){
+  const opts = new Map();
+  for(const [lineName, line] of Object.entries(lines)){
+    const i = line.stations.indexOf(from);
+    if(i < 0) continue;
+
+    for(let j=0;j<line.stations.length;j++){
+      if(j === i) continue;
+      const to = line.stations[j];
+      const route = directRouteOnLine(from, to, lineName);
+      if(!route) continue;
+
+      const prev = opts.get(to);
+      if(!prev || route.time < prev.time){
+        opts.set(to, {station:to, line:lineName, time:route.time, route:route.route});
+      }
+    }
+  }
+  return [...opts.values()].sort((a,b)=>a.time-b.time);
+}
+
+function directRouteOnLine(from, to, lineName){
+  const line = lines[lineName];
+  const i = line.stations.indexOf(from);
+  const j = line.stations.indexOf(to);
+  if(i < 0 || j < 0 || i === j) return null;
+
+  const step = i < j ? 1 : -1;
+  const route = [];
+  let time = 0;
+  for(let k=i; ; k += step){
+    route.push(line.stations[k]);
+    if(k === j) break;
+    const tIndex = step === 1 ? k : k-1;
+    time += line.times[tIndex];
+  }
+  return {line:lineName, route, time};
+}
+
+function bestDirectRoute(from, to){
+  const candidates = [];
+  for(const lineName of Object.keys(lines)){
+    const r = directRouteOnLine(from, to, lineName);
+    if(r) candidates.push(r);
+  }
+  if(!candidates.length) return null;
+  candidates.sort((a,b)=>a.time-b.time);
+  return candidates[0];
+}
+
+// 「乗換駅」をノードとした探索。
+// 1回の辺 = 1本の列車・路線で乗換なしに移動可能。
+function shortestTransferRoute(start, goal){
+  // ゲーム仕様：
+  // 出発駅と目的駅の間に「乗換なし」で走る列車・相互直通運転が存在する場合、
+  // 時間帯を問わず、その直通パターンを最速正解として最優先する。
+  const direct = bestDirectRoute(start, goal);
+  if(direct){
+    return {
+      distance: direct.time,
+      route: [start, goal],
+      segments: [{
+        from: start,
+        to: goal,
+        line: direct.line,
+        time: direct.time,
+        route: direct.route
+      }],
+      transfers: 0
+    };
+  }
+
+  const best = {};
+  const prev = {};
+  const prevSeg = {};
+  const queue = [{station:start, time:0, transfers:-1, legs:0}];
+  best[start] = {time:0, transfers:-1, legs:0};
+
+  while(queue.length){
+    queue.sort((a,b) => (a.time-b.time) || (a.transfers-b.transfers));
+    const cur = queue.shift();
+    if(cur.station === goal) break;
+
+    for(const opt of directOptions(cur.station)){
+      const nextTransfers = cur.legs === 0 ? 0 : cur.transfers + 1;
+      const next = {
+        station: opt.station,
+        time: cur.time + opt.time,
+        transfers: nextTransfers,
+        legs: cur.legs + 1
+      };
+
+      const old = best[opt.station];
+      if(!old || next.time < old.time || (next.time === old.time && next.transfers < old.transfers)){
+        best[opt.station] = next;
+        prev[opt.station] = cur.station;
+        prevSeg[opt.station] = opt;
+        queue.push(next);
+      }
+    }
+  }
+
+  if(!best[goal]) return {distance:Infinity, route:[], segments:[], transfers:Infinity};
+
+  const segments = [];
+  let cur = goal;
+  while(cur !== start){
+    const seg = prevSeg[cur];
+    segments.unshift({
+      from: prev[cur],
+      to: cur,
+      line: seg.line,
+      time: seg.time,
+      route: seg.route
+    });
+    cur = prev[cur];
+  }
+
+  const transferStations = [start, ...segments.map(s=>s.to)];
+  return {
+    distance: best[goal].time,
+    route: transferStations,
+    segments,
+    transfers: Math.max(0, segments.length-1)
+  };
+}
+
+function calcChosenRouteTime(p){
+  let total = 0;
+  const segments = [];
+  for(let i=0;i<p.length-1;i++){
+    const r = bestDirectRoute(p[i], p[i+1]);
+    if(!r) return {time:Infinity, segments:[]};
+    total += r.time;
+    segments.push({from:p[i],to:p[i+1],line:r.line,time:r.time,route:r.route});
+  }
+  return {time:total, segments};
+}
+let q = 0;
+let total = 0;
+let currentFrom = "";
+let currentTo = "";
+let path = [];
+let timeLeft = 20;
+let timerId = null;
+let questionStart = 0;
+let records = [];
+let currentCorrect = null;
+let currentOptions = [];
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const header = document.getElementById('appHeader');
+  if(header) header.style.display = (id === 'game' ? 'grid' : 'none');
+}
+
+
+const stationPositions = {
+  "吉祥寺":[10,42],"下北沢":[18,61],"新宿":[27,40],"新宿三丁目":[29,43],
+  "池袋":[31,22],"渋谷":[32,60],"表参道":[39,56],"目黒":[38,70],
+  "大崎":[43,78],"品川":[50,82],"川崎":[58,90],"横浜":[66,94],
+  "四ツ谷":[46,43],"赤坂見附":[52,57],"国会議事堂前":[55,63],
+  "飯田橋":[54,31],"九段下":[57,40],"御茶ノ水":[61,34],"神田":[65,41],
+  "秋葉原":[67,30],"上野":[72,19],"東京":[68,48],"大手町":[63,46],
+  "日本橋":[72,51],"銀座":[68,61],"日比谷":[64,59],"新橋":[64,70]
+};
+
+const problemMapPositions = {
+  "吉祥寺":[12,44],"下北沢":[20,64],"新宿":[29,42],"新宿三丁目":[31,43],
+  "池袋":[34,20],"渋谷":[33,61],"表参道":[41,57],"目黒":[39,70],
+  "大崎":[43,78],"品川":[51,84],"川崎":[58,91],"横浜":[44,94],
+  "四ツ谷":[47,43],"赤坂見附":[52,57],"国会議事堂前":[55,62],
+  "飯田橋":[55,31],"九段下":[58,40],"御茶ノ水":[62,34],"神田":[65,41],
+  "秋葉原":[68,31],"上野":[71,20],"東京":[68,49],"大手町":[65,46],
+  "日本橋":[73,52],"銀座":[68,61],"日比谷":[64,59],"新橋":[66,70],
+  "新木場":[82,77],"門前仲町":[77,57],"押上":[82,35],"北千住":[82,18],
+  "中野":[22,34]
+};
+function updateHintMap(from, to){
+  const p1 = problemMapPositions[from] || [30,45];
+  const p2 = problemMapPositions[to] || [70,55];
+  const a = document.getElementById("mapFromOnly");
+  const b = document.getElementById("mapToOnly");
+  if(a){
+    a.textContent = from;
+    a.style.left = p1[0] + "%";
+    a.style.top = p1[1] + "%";
+  }
+  if(b){
+    b.textContent = to;
+    b.style.left = p2[0] + "%";
+    b.style.top = p2[1] + "%";
+  }
+}
+
+
+function updateTimerRing(seconds){
+  const progress = document.getElementById('timerProgress');
+  if(!progress) return;
+  const total = 20;
+  const circumference = 2 * Math.PI * 21;
+  const clamped = Math.max(0, Math.min(total, seconds));
+  const offset = circumference * (1 - clamped / total);
+  progress.style.strokeDasharray = circumference.toFixed(2);
+  progress.style.strokeDashoffset = offset.toFixed(2);
+}
+
+function startGame(){
+  q = 0;
+  total = 0;
+  const hs=document.getElementById('headerScore'); if(hs) hs.textContent='0'; updateTimerRing(20);
+  records = [];
+
+  questionPool = [...correctMaster];
+  for(let i=questionPool.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [questionPool[i], questionPool[j]] = [questionPool[j], questionPool[i]];
+  }
+  questionPool = questionPool.slice(0,5);
+
+  newQuestion();
+}
+
+function newQuestion(){
+  q++;
+  document.getElementById('qnum').textContent = q;
+  const hq=document.getElementById('headerQ'); if(hq) hq.textContent=q;
+
+  currentQuestionData = questionPool[q-1];
+  currentFrom = currentQuestionData.from;
+  currentTo = currentQuestionData.to;
+  updateHintMap(currentFrom, currentTo);
+
+  path = [currentFrom];
+  timeLeft = 20;
+  questionStart = Date.now();
+  document.getElementById('from').textContent = currentFrom;
+  document.getElementById('to').textContent = currentTo;
+  document.getElementById('route').textContent = currentFrom;
+  prepareQuestionOptions();
+  renderChoices();
+  show('game');
+
+  clearInterval(timerId);
+  document.getElementById('timer').textContent = timeLeft;
+  const ht=document.getElementById('headerTimer'); if(ht) ht.textContent=timeLeft; updateTimerRing(timeLeft);
+  document.getElementById('timer').classList.remove('low');
+  timerId = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timer').textContent = timeLeft;
+    const ht=document.getElementById('headerTimer'); if(ht) ht.textContent=timeLeft; updateTimerRing(timeLeft);
+    if(timeLeft <= 5) document.getElementById('timer').classList.add('low');
+    if(timeLeft <= 0){
+      clearInterval(timerId);
+      path = [currentFrom];
+      finishQuestion(true, false, "時間切れ", Infinity);
+    }
+  }, 1000);
+}
+
+function prepareQuestionOptions(){
+  const correctTransfer = currentQuestionData.transfer;
+
+  currentCorrect = {
+    type: "transfer",
+    label: correctTransfer + "で乗り換え",
+    transfer: correctTransfer
+  };
+
+  const distractors = [];
+  const allTransfers = [...new Set(correctMaster.map(q => q.transfer))]
+    .filter(s => s && s !== correctTransfer && s !== currentFrom && s !== currentTo);
+
+  // まずは、現在の出発駅から一応向かえる駅を優先して誤答候補にする
+  const reachable = directOptions(currentFrom)
+    .map(o => o.station)
+    .filter(s => s !== correctTransfer && s !== currentTo && s !== currentFrom);
+
+  for(const s of reachable){
+    if(distractors.length >= 3) break;
+    if(!distractors.includes(s)) distractors.push(s);
+  }
+
+  // 足りなければ正解マスターに登場する乗換駅から補完
+  const shuffled = [...allTransfers].sort(() => Math.random() - 0.5);
+  for(const s of shuffled){
+    if(distractors.length >= 3) break;
+    if(!distractors.includes(s)) distractors.push(s);
+  }
+
+  currentOptions = [
+    currentCorrect,
+    ...distractors.slice(0,3).map(s => ({
+      type:"transfer",
+      label:s + "で乗り換え",
+      transfer:s
+    }))
+  ];
+
+  for(let i=currentOptions.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [currentOptions[i], currentOptions[j]] = [currentOptions[j], currentOptions[i]];
+  }
+}
+
+function renderChoices(){
+  const box = document.getElementById('choices');
+  box.innerHTML = "";
+
+  currentOptions.forEach((opt, idx) => {
+    const b = document.createElement('button');
+    b.className = 'stationBtn';
+    b.setAttribute('data-letter', ['A','B','C','D'][idx] || '');
+    b.textContent = opt.label;
+    b.onclick = () => answerChoice(idx);
+    box.appendChild(b);
+  });
+}
+
+function answerChoice(index){
+  clearInterval(timerId);
+  const chosen = currentOptions[index];
+  const correct = (
+    chosen.type === currentCorrect.type &&
+    chosen.label === currentCorrect.label
+  );
+
+  let chosenRoute = [currentFrom];
+  let chosenTime = Infinity;
+
+  if(correct){
+    chosenRoute = [currentFrom, currentQuestionData.transfer, currentTo];
+    chosenTime = currentQuestionData.ride_minutes;
+  } else {
+    // 誤答でも目的地までつながる形で表示する。
+    // 既存簡易ネットワークで補完し、組めない場合は回答ラベルだけ記録する。
+    const firstLeg = bestDirectRoute(currentFrom, chosen.transfer);
+    const rest = shortestTransferRoute(chosen.transfer, currentTo);
+    if(firstLeg && Number.isFinite(rest.distance)){
+      chosenRoute = [currentFrom, chosen.transfer, ...rest.route.slice(1)];
+      chosenTime = firstLeg.time + rest.distance;
+    }
+  }
+
+  path = chosenRoute;
+  finishQuestion(false, correct, chosen.label, chosenTime);
+}
+
+function goHome(){
+  clearInterval(timerId);
+  show('home');
+}
+
+function updateRoute(){
+  document.getElementById('route').textContent = path.join(" → ");
+}
+
+function formatSegments(segments){
+  return segments.map(s => `${s.from} → ${s.to}（${s.line}）`).join(" / ");
+}
+
+function formatLineGuide(segments){
+  if(!segments || !segments.length) return "—";
+  return segments.map((s, idx) => {
+    const prefix = idx === 0 ? "" : " → ";
+    return `${prefix}${s.line}［${s.from} → ${s.to}］`;
+  }).join("");
+}
+
+function finishQuestion(timeout, isCorrect=false, answerLabel="", explicitYourTime=null){
+  const best = {
+    distance: currentQuestionData.ride_minutes,
+    route: [currentFrom, currentQuestionData.transfer, currentTo],
+    segments: [
+      {from: currentFrom, to: currentQuestionData.transfer, line: currentQuestionData.line1, time: null, route: [currentFrom, currentQuestionData.transfer]},
+      {from: currentQuestionData.transfer, to: currentTo, line: currentQuestionData.line2, time: null, route: [currentQuestionData.transfer, currentTo]}
+    ]
+  };
+  const chosen = calcChosenRouteTime(path);
+  const your = explicitYourTime !== null ? explicitYourTime : (timeout ? Infinity : chosen.time);
+  const elapsed = Math.min(20, Math.round((Date.now()-questionStart)/1000));
+
+  let score = 0;
+  let baseScore = 0;
+  let timePenalty = 0;
+  let detourPenalty = 0;
+  const diff = Number.isFinite(your) ? Math.max(0, your - best.distance) : null;
+
+  if(timeout){
+    score = 0;
+  } else if(isCorrect){
+    // 正解そのものを重視。正解で7,000点、速さで最大+3,000点。
+    // 20秒ぎりぎりでも正解なら約7,000点、即答ならほぼ10,000点。
+    const remaining = Math.max(0, 20 - elapsed);
+    baseScore = 7000;
+    const speedBonus = Math.round((remaining / 20) * 3000);
+    score = baseScore + speedBonus;
+  } else {
+    // 適当に選んでも偏差値が上がらないよう、不正解は0点。
+    score = 0;
+  }
+
+  total += score;
+  const hs=document.getElementById('headerScore'); if(hs) hs.textContent=total.toLocaleString();
+
+  const correctAnswerLabel = currentQuestionData.transfer + "で乗り換え";
+
+  records.push({
+    n:q,
+    from:currentFrom,
+    to:currentTo,
+    score,
+    correct:isCorrect,
+    timeout,
+    answer:answerLabel || (timeout ? "時間切れ" : "未回答"),
+    correctAnswer:correctAnswerLabel,
+    yourRoute:path.slice(),
+    bestRoute:best.route.slice(),
+    bestSegments:best.segments.map(s => ({...s})),
+    yourSegments:chosen.segments.map(s => ({...s})),
+    bestTime:best.distance,
+    yourTime:Number.isFinite(your) ? your : null,
+    elapsed,
+    diff,
+    baseScore,
+    timePenalty,
+    detourPenalty
+  });
+
+  // 1問ごとの結果画面は出さず、そのまま次へ
+  if(q >= 5){
+    showFinal();
+  } else {
+    newQuestion();
+  }
+}
+
+function showFinal(){
+  show('final');
+  document.getElementById('totalScore').textContent = total.toLocaleString() + '点';
+
+  const avg = total/5;
+
+  // 東京偏差値は最低15・最高70。
+  // 正解数を中心に、回答速度で上積みされる設計。
+  const normalized = Math.max(0, Math.min(1, avg / 10000));
+  // 最低15・最高70は維持。中間帯を低めにし、偏差値50には高い正答率が必要。
+  const dev = Math.round(15 + 55 * Math.pow(normalized, 1.25));
+  document.getElementById('deviation').textContent = "東京偏差値 " + dev;
+
+  const details = document.getElementById('details');
+  details.innerHTML = "";
+
+  records.forEach(r => {
+    const status = r.timeout ? "時間切れ" : (r.correct ? "○ 正解" : "× 不正解");
+    const card = document.createElement('div');
+    card.className = 'detail-card';
+    card.innerHTML = `
+      <div class="detail-head">
+        <div>
+          <div style="font-weight:900;font-size:18px;">Q${r.n} ${r.from} → ${r.to}</div>
+          <div class="subtle">${status}</div>
+        </div>
+        <div style="font-weight:900;font-size:22px;">${r.score.toLocaleString()}点</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="subtle">正解</div>
+        <div><strong>${r.correctAnswer}</strong></div>
+      </div>
+
+      <div class="detail-row">
+        <div class="subtle">あなたの回答</div>
+        <div><strong>${r.answer}</strong></div>
+      </div>
+
+      <div class="detail-row">
+        <div class="subtle">最速ルート</div>
+        <div>${r.bestRoute.join(" → ")}</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="subtle">使う路線</div>
+        <div><strong>${formatLineGuide(r.bestSegments)}</strong></div>
+      </div>
+
+      <div class="detail-row">
+        <div class="subtle">最速所要時間</div>
+        <div><strong>約${r.bestTime}分</strong></div>
+      </div>
+
+
+    `;
+    details.appendChild(card);
+  });
+}
+</script>
+<script>document.addEventListener('DOMContentLoaded',()=>{const h=document.getElementById('appHeader');if(h)h.style.display='none';});</script>
+</body>
+</html>
