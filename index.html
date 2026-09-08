@@ -47,7 +47,8 @@
     .choice-note{text-align:center;margin-top:12px;color:#667085;font-size:11px}
 
     .result-card{text-align:center}.bigscore{font-size:clamp(48px,10vw,86px);font-weight:950}.grade{font-size:28px;font-weight:900}.detail-card{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:12px;text-align:left}.detail-head{display:flex;justify-content:space-between;gap:12px}.detail-row{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
-    @media(max-width:760px){.wrap{width:min(95vw,1000px);padding-top:16px}.game-head{display:block}.game-logo{margin-bottom:10px}.stats{grid-template-columns:1fr 1fr 1.25fr;gap:7px}.stat{min-height:58px}.stat .value{font-size:20px}.question-strip{font-size:16px}.grid.two{grid-template-columns:1fr}.choice-stage{min-height:0;padding:22px 14px}.route-summary .pair{font-size:34px}.stationBtn{height:56px}.brand{font-size:25px}}
+    @media(max-width:760px){
+      .best-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.wrap{width:min(95vw,1000px);padding-top:16px}.game-head{display:block}.game-logo{margin-bottom:10px}.stats{grid-template-columns:1fr 1fr 1.25fr;gap:7px}.stat{min-height:58px}.stat .value{font-size:20px}.question-strip{font-size:16px}.grid.two{grid-template-columns:1fr}.choice-stage{min-height:0;padding:22px 14px}.route-summary .pair{font-size:34px}.stationBtn{height:56px}.brand{font-size:25px}}
   
     .mode-title{font-size:18px;font-weight:950;margin:24px 0 10px}
     .mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
@@ -58,9 +59,9 @@
     .best-box{margin:18px auto 0;max-width:720px;background:#f8fafc;border:1px solid var(--line);border-radius:13px;padding:14px 16px;text-align:left}
     .best-title{font-size:13px;font-weight:900;color:#344054;margin-bottom:8px}
     .best-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-    .best-item{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
-    .best-item .bmode{font-size:11px;color:#667085;font-weight:800}
-    .best-item .bscore{font-size:18px;font-weight:950;margin-top:3px}
+    .best-item{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 6px;text-align:center;min-width:0}
+    .best-item .bmode{font-size:clamp(9px,2.5vw,11px);color:#667085;font-weight:800;white-space:nowrap}
+    .best-item .bscore{font-size:clamp(13px,3.5vw,18px);font-weight:950;margin-top:3px;white-space:nowrap}
     .mode-chip{display:inline-flex;align-items:center;background:#eef4ff;color:#1849a9;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:900;margin-bottom:8px}
     .title-badge{display:inline-flex;align-items:center;justify-content:center;margin:10px auto 2px;background:#fff8e8;border:1px solid #f0b84b;border-radius:999px;padding:8px 16px;font-size:18px;font-weight:950;color:#7a4d00}
     .best-result{margin:12px auto 0;max-width:420px;background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-weight:800}
@@ -68,16 +69,18 @@
     .share-status{min-height:20px;margin-top:8px;font-size:12px;color:#667085}
     @media(max-width:760px){
       .mode-grid{grid-template-columns:1fr}
-      .best-grid{grid-template-columns:1fr 1fr 1fr}
+      .best-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
       .mode-btn{padding:14px}
       .share-row{grid-template-columns:1fr}
     }
 
   
-    .praise-line{min-height:40px;display:flex;align-items:center;justify-content:center;text-align:center;
-      font-weight:950;font-size:18px;color:#7a4d00;margin:2px 0 10px;opacity:0;transform:translateY(-4px);
-      transition:.2s ease}
-    .praise-line.show{opacity:1;transform:translateY(0)}
+    .praise-line{
+      min-height:0;display:none;align-items:center;justify-content:center;text-align:center;
+      font-weight:1000;font-size:20px;color:#7a4d00;margin:0 0 12px;
+      background:#fff8e8;border:1.5px solid #f0b84b;border-radius:12px;padding:10px 14px;
+    }
+    .praise-line.show{display:flex}
     .answer.correct-flash{border-color:#12b76a!important;background:#ecfdf3!important}
     .answer.wrong-flash{border-color:#f04438!important;background:#fef3f2!important}
     .answer.correct-answer{border-color:#12b76a!important;background:#ecfdf3!important}
@@ -88,51 +91,100 @@
     .percentile{font-size:14px;font-weight:900;color:#475467;margin-top:4px}
     #shareCanvas{display:block;width:100%;height:auto}
 
+
+    .correct-now{
+      position:fixed;left:50%;top:35%;transform:translate(-50%,-50%) scale(.92);
+      z-index:120;background:#ecfdf3;border:2px solid #12b76a;color:#067647;
+      border-radius:18px;padding:16px 30px;font-size:34px;font-weight:1000;
+      box-shadow:0 14px 36px rgba(16,24,40,.18);
+      opacity:0;pointer-events:none;transition:opacity .08s ease,transform .08s ease;
+    }
+    .correct-now.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+
+    .playtype-title{font-size:18px;font-weight:950;margin:26px 0 10px;text-align:left}
+    .playtype-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0 18px}
+    .playtype-card{border:1.5px solid var(--line);border-radius:16px;background:#fff;padding:20px;text-align:left}
+    .playtype-card h3{margin:0 0 6px;font-size:22px}
+    .playtype-card p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.65}
+    .normal-card{border-color:#84adff;background:#f5f8ff}
+    .rush-card{border-color:#f0b84b;background:#fffdf7}
+    .rush-card .primary{width:100%;background:#b54708;border-color:#b54708}
+    .normal-card .mode-grid{margin:12px 0 0}
+    .normal-card .mode-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .rush-best{margin-top:10px;font-weight:900;color:#7a4d00;text-align:center}
+    .rush-result-main{font-size:clamp(58px,11vw,92px);font-weight:1000;line-height:1;margin:12px 0 8px}
+    .rush-result-unit{font-size:22px;font-weight:900}
+    .master-cert{margin:18px auto 4px;max-width:520px;border:2px solid #f0b84b;background:#fff8e8;border-radius:18px;padding:20px;font-weight:1000;font-size:24px;color:#7a4d00}
+    .rush-sub{color:#667085;font-weight:800;margin-top:8px}
+    @media(max-width:760px){
+      .playtype-grid{grid-template-columns:1fr}
+      .normal-card .mode-grid{grid-template-columns:1fr}
+    }
+
+
+    .world-box{margin:12px auto 0;max-width:720px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px 16px;text-align:left}
+    .world-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+    .world-title{font-size:13px;font-weight:950;color:#344054}
+    .world-note{font-size:10px;color:#98a2b3}
+    .world-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    .world-item{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:10px 6px;text-align:center;min-width:0}
+    .world-item .wmode{font-size:clamp(9px,2.5vw,11px);color:#667085;font-weight:800;white-space:nowrap}
+    .world-item .wrank{font-size:clamp(12px,3.2vw,17px);font-weight:950;margin-top:3px;white-space:nowrap}
+    .world-status{text-align:center;font-size:11px;color:#667085;margin-top:8px}
+    .result-world-rank{margin:12px auto 0;max-width:420px;background:#eef4ff;border:1px solid #b2ccff;border-radius:12px;padding:11px 14px;font-weight:900;color:#1849a9}
+
 </style>
 </head>
 <body>
+<div id="correctNow" class="correct-now">正解！</div>
 <div class="wrap">
     <section id="home" class="screen active">
       <div class="brand">乗り換え<span class="rush">RUSH</span></div>
       <div class="home-card hero">
         <h1>東京の移動力、試してみる？</h1>
-        <p>出発駅から目的駅まで、最速になる乗換駅を4択から選ぶゲームです。</p>
-        <div style="text-align:left;margin:22px auto;max-width:720px;line-height:1.9">
-          <strong style="font-size:19px">遊び方</strong>
-          <ol>
-            <li>出発駅と目的駅が表示されます。</li><li>4つの候補から最速になる乗換ルートを選びます。</li><li>1問20秒、全5問です。</li><li>最後に東京偏差値と総合スコアが表示されます。</li>
-          </ol>
-        </div>
-        
-        <div class="mode-title">難易度を選ぶ</div>
-        <div class="mode-grid">
-          <button class="mode-btn" onclick="startGame('beginner')">
-            <strong>初級モード</strong>
-            
-          </button>
-          <button class="mode-btn" onclick="startGame('intermediate')">
-            <strong>中級モード</strong>
-            
-          </button>
-          <button class="mode-btn" onclick="startGame('extreme')">
-            <strong>激むずモード</strong>
-            
-          </button>
-        </div>
-        <div class="best-box">
-          <div class="best-title">あなたのベスト記録</div>
-          <div class="best-grid">
-            <div class="best-item"><div class="bmode">初級</div><div id="best-beginner" class="bscore">—</div></div>
-            <div class="best-item"><div class="bmode">中級</div><div id="best-intermediate" class="bscore">—</div></div>
-            <div class="best-item"><div class="bmode">激むず</div><div id="best-extreme" class="bscore">—</div></div>
+        <p>最速の乗換ルートを4択から選ぶ、東京移動力ゲーム。</p>
+        <div class="playtype-title">プレイモードを選ぶ</div>
+        <div class="playtype-grid">
+          <div class="playtype-card normal-card">
+            <h3>通常モード</h3>
+            <p>1問20秒・全5問。5問の結果から東京偏差値を判定します。</p>
+            <div class="mode-grid">
+              <button class="mode-btn" onclick="startGame('beginner')"><strong>初級</strong></button>
+              <button class="mode-btn" onclick="startGame('intermediate')"><strong>中級</strong></button>
+              <button class="mode-btn" onclick="startGame('extreme')"><strong>上級</strong></button>
+            </div>
+          </div>
+
+          <div class="playtype-card rush-card">
+            <h3>🔥 ラッシュモード</h3>
+            <p>100問マスターからランダム出題。1問20秒で、間違えるか時間切れになるまで連続挑戦。100問連続正解で「乗り換えRUSH MASTER」認定。</p>
+            <button class="primary" onclick="startRush()">ラッシュに挑戦</button>
           </div>
         </div>
 
-        <div class="stats-strip">
-          <div class="stat-card"><small>プレイ回数</small><strong id="statPlays">0</strong></div>
-          <div class="stat-card"><small>総正解数</small><strong id="statCorrect">0</strong></div>
-          <div class="stat-card"><small>最高コンボ</small><strong id="statCombo">0</strong></div>
-          <div class="stat-card"><small>最高偏差値</small><strong id="statDev">—</strong></div>
+        <div class="best-box">
+          <div class="best-title">ベスト記録</div>
+          <div class="best-grid">
+            <div class="best-item"><div class="bmode">初級</div><div id="best-beginner" class="bscore">—</div></div>
+            <div class="best-item"><div class="bmode">中級</div><div id="best-intermediate" class="bscore">—</div></div>
+            <div class="best-item"><div class="bmode">上級</div><div id="best-extreme" class="bscore">—</div></div>
+            <div class="best-item"><div class="bmode">RUSH</div><div id="best-rush" class="bscore">0問</div></div>
+          </div>
+        </div>
+
+        <div class="world-box">
+          <div class="world-head">
+            <div class="world-title">🌍 世界ランキング</div>
+            <div class="world-note">匿名データ</div>
+          </div>
+          <div class="world-grid">
+            <div class="world-item"><div class="wmode">初級</div><div id="world-beginner" class="wrank">—</div></div>
+            <div class="world-item"><div class="wmode">中級</div><div id="world-intermediate" class="wrank">—</div></div>
+            <div class="world-item"><div class="wmode">上級</div><div id="world-extreme" class="wrank">—</div></div>
+            <div class="world-item"><div class="wmode">RUSH</div><div id="world-rush" class="wrank">—</div></div>
+          </div>
+          <div id="worldStatus" class="world-status">ランキング接続前</div>
         </div>
 
       </div>
@@ -142,8 +194,8 @@
       <div class="game-head">
         <div class="game-logo">乗り換え<span class="rush">RUSH</span></div>
         <div class="stats">
-          <div class="stat"><div><div class="label">問題</div><div class="value"><span id="qnum">1</span>/5</div></div></div>
-          <div class="stat"><div><div class="label">スコア</div><div id="liveScore" class="value">0</div></div></div>
+          <div class="stat"><div><div class="label" id="questionLabel">問題</div><div class="value"><span id="qnum">1</span>/<span id="qtotal">5</span></div></div></div>
+          <div class="stat"><div><div class="label" id="liveLabel">スコア</div><div id="liveScore" class="value">0</div></div></div>
           <div class="stat time-stat"><div><div class="label">残り時間</div><div class="value"><span id="timer">20</span><span class="unit">秒</span></div></div><div class="timer-ring"><span></span></div></div>
         </div>
       </div>
@@ -162,16 +214,29 @@
     <section id="final" class="screen">
       <div class="brand">乗り換え<span class="rush">RUSH</span></div>
       <div class="result-card">
-        <div id="finalMode" class="mode-chip">初級モード</div>
-        <div class="subtle">TOKYO SCORE</div><div id="deviation" class="bigscore">東京偏差値 50</div>
-        <div id="titleBadge" class="title-badge">東京移動マスター</div><div id="percentile" class="percentile"></div>
-        <div id="finalGrade" class="grade"></div>
-        <div id="bestResult" class="best-result">ベスト記録 —</div>
-        <div class="subtle" style="margin-top:12px">総合スコア</div><div id="totalScore" style="font-size:36px;font-weight:950;margin-top:4px">0点</div>
+        <div id="normalResultArea">
+          <div id="finalMode" class="mode-chip">初級モード</div>
+          <div class="subtle">TOKYO SCORE</div><div id="deviation" class="bigscore">東京偏差値 50</div>
+          <div id="titleBadge" class="title-badge">東京移動マスター</div><div id="percentile" class="percentile"></div>
+          <div id="finalGrade" class="grade"></div>
+          <div id="bestResult" class="best-result">ベスト記録 —</div>
+          <div id="normalWorldRank" class="result-world-rank" style="display:none">🌍 世界順位を集計中...</div>
+          <div class="subtle" style="margin-top:12px">総合スコア</div><div id="totalScore" style="font-size:36px;font-weight:950;margin-top:4px">0点</div>
+        </div>
+        <div id="rushResultArea" style="display:none">
+          <div class="mode-chip">ラッシュモード</div>
+          <div class="subtle">連続正解記録</div>
+          <div class="rush-result-main"><span id="rushCorrectCount">0</span><span class="rush-result-unit">問</span></div>
+          <div id="rushResultMessage" class="title-badge">挑戦終了！</div>
+          <div id="rushBestResult" class="best-result">最高記録 —</div>
+          <div id="rushWorldRank" class="result-world-rank" style="display:none">🌍 世界順位を集計中...</div>
+          <div id="masterCert" class="master-cert" style="display:none">🏆 乗り換えRUSH MASTER 認定</div>
+          <div id="rushSub" class="rush-sub"></div>
+        </div>
         <canvas id="shareCanvas" width="1080" height="1350" style="display:none"></canvas><div id="details"></div>
         <div class="share-row">
           <button class="primary" onclick="shareResult()">結果をシェア</button>
-          <button class="ghost" onclick="startGame(currentMode)">もう一度遊ぶ</button>
+          <button class="ghost" onclick="restartCurrentGame()">もう一度遊ぶ</button>
           <button class="ghost" onclick="goHome()">トップに戻る</button>
         </div>
         <div id="shareStatus" class="share-status"></div>
@@ -423,10 +488,147 @@ const extremePool = buildQuestionPool(3, Infinity);
 const modeConfig = {
   beginner: {label:"初級モード", short:"初級", pool:questionPool},
   intermediate: {label:"中級モード", short:"中級", pool:intermediatePool},
-  extreme: {label:"激むずモード", short:"激むず", pool:extremePool}
+  extreme: {label:"上級モード", short:"上級", pool:extremePool}
 };
 
+
+/*
+  世界ランキング用Supabase設定
+  Supabaseでプロジェクト作成後、下記2項目を入力すると自動で世界ランキングが有効になります。
+*/
+const SUPABASE_URL = "";
+const SUPABASE_ANON_KEY = "";
+const RANKING_TABLE = "norikae_scores";
+
+function rankingEnabled(){
+  return /^https:\/\/.+\.supabase\.co$/i.test(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 20;
+}
+
+function getPlayerId(){
+  const key="norikaeRushPlayerId";
+  try{
+    let id=localStorage.getItem(key);
+    if(!id){
+      id=(crypto && crypto.randomUUID) ? crypto.randomUUID() :
+        "p_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2);
+      localStorage.setItem(key,id);
+    }
+    return id;
+  }catch(e){
+    return "anonymous";
+  }
+}
+
+async function supabaseRequest(path, options={}){
+  if(!rankingEnabled()) throw new Error("ranking_not_configured");
+  const headers={
+    "apikey":SUPABASE_ANON_KEY,
+    "Authorization":"Bearer "+SUPABASE_ANON_KEY,
+    "Content-Type":"application/json",
+    ...(options.headers||{})
+  };
+  const res=await fetch(SUPABASE_URL+"/rest/v1/"+path,{...options,headers});
+  if(!res.ok) throw new Error("ranking_http_"+res.status);
+  return res;
+}
+
+async function submitWorldScore(mode, scoreValue, totalScoreValue=0){
+  if(!rankingEnabled()) return null;
+  const payload={
+    player_id:getPlayerId(),
+    mode,
+    score_value:Number(scoreValue)||0,
+    total_score:Number(totalScoreValue)||0,
+    user_agent:navigator.userAgent.slice(0,180)
+  };
+  await supabaseRequest(RANKING_TABLE,{
+    method:"POST",
+    headers:{"Prefer":"return=minimal"},
+    body:JSON.stringify(payload)
+  });
+  return getWorldRank(mode, payload.score_value);
+}
+
+async function getWorldRank(mode, scoreValue){
+  if(!rankingEnabled()) return null;
+
+  const totalRes=await supabaseRequest(
+    `${RANKING_TABLE}?mode=eq.${encodeURIComponent(mode)}&select=id`,
+    {headers:{"Prefer":"count=exact"}}
+  );
+  const totalHeader=totalRes.headers.get("content-range")||"";
+  const totalMatch=totalHeader.match(/\/(\d+)$/);
+  const total=totalMatch ? Number(totalMatch[1]) : 0;
+
+  const higherRes=await supabaseRequest(
+    `${RANKING_TABLE}?mode=eq.${encodeURIComponent(mode)}&score_value=gt.${encodeURIComponent(scoreValue)}&select=id`,
+    {headers:{"Prefer":"count=exact"}}
+  );
+  const higherHeader=higherRes.headers.get("content-range")||"";
+  const higherMatch=higherHeader.match(/\/(\d+)$/);
+  const higher=higherMatch ? Number(higherMatch[1]) : 0;
+
+  return {rank:higher+1,total};
+}
+
+async function refreshWorldRanks(){
+  const status=document.getElementById("worldStatus");
+  if(!rankingEnabled()){
+    if(status) status.textContent="ランキング接続前";
+    return;
+  }
+  if(status) status.textContent="世界データを集計中...";
+  const modes=["beginner","intermediate","extreme","rush"];
+  for(const mode of modes){
+    const el=document.getElementById("world-"+mode);
+    if(!el) continue;
+    let bestValue=0;
+    if(mode==="rush") bestValue=getRushBest();
+    else {
+      const best=getBest(mode);
+      bestValue=best ? best.deviation : 0;
+    }
+    if(!bestValue){ el.textContent="未参加"; continue; }
+    try{
+      const data=await getWorldRank(mode,bestValue);
+      el.textContent=data && data.total ? `${data.rank}位/${data.total}人` : "—";
+    }catch(e){
+      el.textContent="取得失敗";
+    }
+  }
+  if(status) status.textContent="世界中の匿名プレイデータから算出";
+}
+
+async function recordNormalWorldResult(mode,deviation,totalScoreValue){
+  const el=document.getElementById("normalWorldRank");
+  if(!rankingEnabled()){ if(el) el.style.display="none"; return; }
+  if(el){ el.style.display="block"; el.textContent="🌍 世界順位を集計中..."; }
+  try{
+    const data=await submitWorldScore(mode,deviation,totalScoreValue);
+    if(el && data) el.textContent=`🌍 世界 ${data.rank}位 / ${data.total}人中`;
+    refreshWorldRanks();
+  }catch(e){
+    if(el) el.textContent="🌍 世界ランキングの取得に失敗しました";
+  }
+}
+
+async function recordRushWorldResult(correctCount){
+  const el=document.getElementById("rushWorldRank");
+  if(!rankingEnabled()){ if(el) el.style.display="none"; return; }
+  if(el){ el.style.display="block"; el.textContent="🌍 世界順位を集計中..."; }
+  try{
+    const data=await submitWorldScore("rush",correctCount,0);
+    if(el && data) el.textContent=`🌍 世界 ${data.rank}位 / ${data.total}人中`;
+    refreshWorldRanks();
+  }catch(e){
+    if(el) el.textContent="🌍 世界ランキングの取得に失敗しました";
+  }
+}
+
 let currentMode = "beginner";
+let gameType = "normal";
+let rushCorrect = 0;
+let rushMasterAchieved = false;
 let lastDeviation = 50;
 let lastTitle = "";
 let combo = 0;
@@ -480,6 +682,18 @@ function renderHomeBests(){
     const best = getBest(mode);
     el.textContent = best ? `偏差値 ${best.deviation}` : "—";
   }
+  const rushEl=document.getElementById("best-rush");
+  if(rushEl) rushEl.textContent=getRushBest()+"問";
+}
+
+function getRushBest(){
+  try{return Number(localStorage.getItem("norikaeRushBest_rush"))||0}catch(e){return 0}
+}
+function saveRushBest(value){
+  const old=getRushBest();
+  const next=Math.max(old,value);
+  try{localStorage.setItem("norikaeRushBest_rush",String(next))}catch(e){}
+  return {best:next,isNew:value>old};
 }
 
 function titleForDeviation(dev){
@@ -530,6 +744,69 @@ function formatTopPercent(p){
   return Math.round(p).toString();
 }
 
+let correctAudioCtx = null;
+
+function playCorrectSound(){
+  try{
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    if(!correctAudioCtx) correctAudioCtx = new AudioCtx();
+    const ctx = correctAudioCtx;
+
+    const tone = (freq,start,duration,volume=0.22,type="sine") => {
+      const osc=ctx.createOscillator(), gain=ctx.createGain();
+      osc.type=type;
+      osc.frequency.setValueAtTime(freq,start);
+      gain.gain.setValueAtTime(0.0001,start);
+      gain.gain.exponentialRampToValueAtTime(volume,start+0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001,start+duration);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(start); osc.stop(start+duration+0.02);
+    };
+
+    const play=()=>{
+      const now=ctx.currentTime+0.01;
+      /* 正解⑤：短い2音、テンポ重視 */
+      tone(880,now,0.10,0.23);
+      tone(1175,now+0.11,0.16,0.26);
+    };
+    if(ctx.state==="suspended") ctx.resume().then(play).catch(()=>{});
+    else play();
+  }catch(e){}
+}
+
+function playWrongSound(){
+  try{
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    if(!correctAudioCtx) correctAudioCtx = new AudioCtx();
+    const ctx = correctAudioCtx;
+
+    const play=()=>{
+      const now=ctx.currentTime+0.01;
+      /* 不正解③：ブー↓ */
+      const osc=ctx.createOscillator(), gain=ctx.createGain();
+      osc.type="sawtooth";
+      osc.frequency.setValueAtTime(190,now);
+      osc.frequency.exponentialRampToValueAtTime(85,now+0.38);
+      gain.gain.setValueAtTime(0.11,now);
+      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.40);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now); osc.stop(now+0.42);
+    };
+    if(ctx.state==="suspended") ctx.resume().then(play).catch(()=>{});
+    else play();
+  }catch(e){}
+}
+function showCorrectNow(){
+  const el=document.getElementById("correctNow");
+  if(!el)return;
+  el.classList.remove("show");
+  void el.offsetWidth;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),700);
+}
+
 function showPendingPraise(){
   const el=document.getElementById("praiseLine");
   if(!el) return;
@@ -541,9 +818,7 @@ function showPendingPraise(){
   el.textContent=pendingPraise;
   el.classList.add("show");
   pendingPraise="";
-  setTimeout(()=>el.classList.remove("show"),1800);
 }
-
 function drawShareCard(){
   const c=document.getElementById("shareCanvas"); if(!c)return;
   const ctx=c.getContext("2d");
@@ -576,21 +851,48 @@ function updateTimerRing(){
   ring.style.background = `conic-gradient(var(--yellow) 0deg ${deg}deg, #eef1f4 ${deg}deg 360deg)`;
 }
 
+function shuffleArray(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
 function startGame(mode="beginner"){
+  gameType="normal";
   currentMode = modeConfig[mode] ? mode : "beginner";
   q = 0; total = 0; records = []; combo = 0; maxComboThisGame = 0; pendingPraise = "";
+  rushCorrect=0; rushMasterAchieved=false;
   const sourcePool = modeConfig[currentMode].pool;
-  gameQuestions = [...sourcePool]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 5);
+  gameQuestions = shuffleArray(sourcePool).slice(0, 5);
   document.getElementById('modeBadge').textContent = modeConfig[currentMode].short;
+  document.getElementById('qtotal').textContent = "5";
+  document.getElementById('liveLabel').textContent = "スコア";
   newQuestion();
 }
 
+function startRush(){
+  gameType="rush";
+  currentMode="beginner";
+  q=0; total=0; records=[]; combo=0; maxComboThisGame=0; pendingPraise="";
+  rushCorrect=0; rushMasterAchieved=false;
+  // 正式な100問マスターを重複なしでシャッフルして出題
+  gameQuestions=shuffleArray(questionPool).slice(0,100);
+  document.getElementById('modeBadge').textContent="RUSH";
+  document.getElementById('qtotal').textContent=String(gameQuestions.length);
+  document.getElementById('liveLabel').textContent="連続正解";
+  newQuestion();
+}
+
+function restartCurrentGame(){
+  if(gameType==="rush") startRush();
+  else startGame(currentMode);
+}
 function newQuestion(){
   q++;
   document.getElementById('qnum').textContent = q;
-  showPendingPraise();
 
   const picked = gameQuestions[q - 1];
   currentFrom = picked.from;
@@ -604,11 +906,12 @@ function newQuestion(){
   document.getElementById('to').textContent = currentTo;
   document.getElementById('fromBig').textContent = currentFrom;
   document.getElementById('toBig').textContent = currentTo;
-  document.getElementById('liveScore').textContent = total.toLocaleString();
+  document.getElementById('liveScore').textContent = gameType==='rush' ? rushCorrect : total.toLocaleString();
   document.getElementById('route').textContent = currentFrom;
   prepareQuestionOptions();
   renderChoices();
   show('game');
+  showPendingPraise();
 
   clearInterval(timerId);
   document.getElementById('timer').textContent = timeLeft;
@@ -620,6 +923,8 @@ function newQuestion(){
     if(timeLeft <= 0){
       clearInterval(timerId);
       path = [currentFrom];
+      if(gameType==="rush") playWrongSound();
+      combo=0; pendingPraise="";
       finishQuestion(true, false, "時間切れ", Infinity);
     }
   }, 1000);
@@ -724,18 +1029,29 @@ function renderChoices(){
 
 function answerChoice(index){
   clearInterval(timerId);
+  const praiseEl=document.getElementById("praiseLine");
+  if(praiseEl) praiseEl.classList.remove("show");
   const chosen = currentOptions[index];
   const correct = !!chosen.correct;
 
   if(correct){
+    playCorrectSound();
+    showCorrectNow();
     combo++;
     maxComboThisGame=Math.max(maxComboThisGame,combo);
-    if(combo===1) pendingPraise="素晴らしい！ 1 COMBO・いいね！";
-    else if(combo===2) pendingPraise="最高！ 2 COMBO！";
-    else if(combo===3) pendingPraise="すごい！ 3 COMBO！";
-    else if(combo===4) pendingPraise="完璧！ 4 COMBO！";
-    else pendingPraise="完全制覇！ 5 COMBO！";
+    if(combo===1) pendingPraise="1 COMBO　いいね！";
+    else if(combo===2) pendingPraise="2 COMBO　最高！";
+    else if(combo===3) pendingPraise="3 COMBO　すごい！";
+    else if(combo===4) pendingPraise="4 COMBO　完璧！";
+    else if(gameType==="normal" && combo===5) pendingPraise="5 COMBO　完全制覇！";
+    else if(combo===10) pendingPraise="10 COMBO　絶好調！";
+    else if(combo===25) pendingPraise="25 COMBO　すごすぎる！";
+    else if(combo===50) pendingPraise="50 COMBO　達人級！";
+    else if(combo===75) pendingPraise="75 COMBO　マスター目前！";
+    else if(combo===99) pendingPraise="99 COMBO　あと1問！";
+    else pendingPraise=combo+" COMBO　連勝中！";
   }else{
+    playWrongSound();
     combo=0;
     pendingPraise="";
   }
@@ -798,7 +1114,10 @@ function finishQuestion(timeout, isCorrect=false, answerLabel="", explicitYourTi
   const liveScoreEl = document.getElementById('liveScore');
   if(liveScoreEl) liveScoreEl.textContent = total.toLocaleString();
 
-  const correctAnswerLabel = formatTransferChoice(best.route);
+  const correctAnswerLabel =
+    ((currentMode==="beginner" || gameType==="rush") && window.currentMaster && window.currentMaster.masterTransfer)
+      ? window.currentMaster.masterTransfer.replace(/駅$/,"")+"で乗り換え"
+      : formatTransferChoice(best.route);
 
   records.push({
     n:q,
@@ -822,7 +1141,25 @@ function finishQuestion(timeout, isCorrect=false, answerLabel="", explicitYourTi
     detourPenalty
   });
 
-  // 1問ごとの結果画面は出さず、そのまま次へ
+  // ラッシュは1問でも不正解・時間切れで終了。正解なら100問まで継続。
+  if(gameType==="rush"){
+    if(isCorrect){
+      rushCorrect++;
+      const live=document.getElementById("liveScore");
+      if(live) live.textContent=rushCorrect;
+      if(rushCorrect>=100 || q>=gameQuestions.length){
+        rushMasterAchieved = rushCorrect>=100;
+        showRushFinal();
+      }else{
+        newQuestion();
+      }
+    }else{
+      showRushFinal();
+    }
+    return;
+  }
+
+  // 通常モードは5問で終了
   if(q >= 5){
     showFinal();
   } else {
@@ -830,8 +1167,72 @@ function finishQuestion(timeout, isCorrect=false, answerLabel="", explicitYourTi
   }
 }
 
+function showRushFinal(){
+  clearInterval(timerId);
+  show('final');
+  document.getElementById('normalResultArea').style.display='none';
+  document.getElementById('rushResultArea').style.display='block';
+  document.getElementById('rushCorrectCount').textContent=rushCorrect;
+
+  const saved=saveRushBest(rushCorrect);
+  const bestEl=document.getElementById('rushBestResult');
+  bestEl.textContent=saved.isNew
+    ? `🎉 NEW BEST！ ${saved.best}問連続正解`
+    : `最高記録　${saved.best}問連続正解`;
+
+  const msg=document.getElementById('rushResultMessage');
+  const cert=document.getElementById('masterCert');
+  const sub=document.getElementById('rushSub');
+
+  if(rushCorrect>=100){
+    msg.textContent="100問連続正解！";
+    cert.style.display='block';
+    sub.textContent="正式100問マスターを完全制覇しました。";
+  }else{
+    cert.style.display='none';
+    if(rushCorrect===0) msg.textContent="ここからリベンジ！";
+    else if(rushCorrect<10) msg.textContent="ナイスチャレンジ！";
+    else if(rushCorrect<25) msg.textContent="二桁突破！";
+    else if(rushCorrect<50) msg.textContent="かなり強い！";
+    else if(rushCorrect<75) msg.textContent="達人級！";
+    else msg.textContent="マスター目前！";
+    sub.textContent=`あと${100-rushCorrect}問でMASTER認定`;
+  }
+
+  const profile=getProfile();
+  profile.plays=(profile.plays||0)+1;
+  profile.correct=(profile.correct||0)+rushCorrect;
+  profile.maxCombo=Math.max(profile.maxCombo||0,rushCorrect);
+  saveProfile(profile);
+  renderProfile();
+  renderHomeBests();
+  recordRushWorldResult(rushCorrect);
+
+  const details=document.getElementById('details');
+  details.innerHTML="";
+  const last=records[records.length-1];
+  if(last && !rushMasterAchieved){
+    const status=last.timeout ? "時間切れ" : "× 不正解";
+    const card=document.createElement('div');
+    card.className='detail-card';
+    card.innerHTML=`
+      <div class="detail-head">
+        <div>
+          <div style="font-weight:900;font-size:18px;">終了問題：${last.from} → ${last.to}</div>
+          <div class="subtle">${status}</div>
+        </div>
+      </div>
+      <div class="detail-row"><div class="subtle">正解</div><div><strong>${last.correctAnswer}</strong></div></div>
+      <div class="detail-row"><div class="subtle">あなたの回答</div><div><strong>${last.answer}</strong></div></div>
+    `;
+    details.appendChild(card);
+  }
+}
+
 function showFinal(){
   show('final');
+  document.getElementById('normalResultArea').style.display='block';
+  document.getElementById('rushResultArea').style.display='none';
   document.getElementById('finalMode').textContent = modeConfig[currentMode].label;
   document.getElementById('totalScore').textContent = total.toLocaleString() + '点';
 
@@ -876,6 +1277,7 @@ function showFinal(){
       : `ベスト記録　偏差値 ${saved.best.deviation}`;
   }
   renderHomeBests();
+  recordNormalWorldResult(currentMode,lastDeviation,total);
 
   const details = document.getElementById('details');
   details.innerHTML = "";
@@ -925,6 +1327,20 @@ function showFinal(){
 }
 
 function buildShareText(){
+  if(gameType==="rush"){
+    if(rushCorrect>=100){
+      return `乗り換えRUSH 🔥
+ラッシュモード
+100問連続正解！
+🏆 乗り換えRUSH MASTER 認定
+あなたは何問までいける？`;
+    }
+    return `乗り換えRUSH 🔥
+ラッシュモード
+${rushCorrect}問連続正解！
+あと${100-rushCorrect}問でMASTER認定
+あなたは何問までいける？`;
+  }
   const correctCount = records.filter(r => r.correct).length;
   return `乗り換えRUSH 🚃
 ${modeConfig[currentMode].label}
@@ -933,7 +1349,6 @@ ${modeConfig[currentMode].label}
 最高${maxComboThisGame}コンボ
 あなたの東京移動力は？`;
 }
-
 async function shareResult(){
   const text = buildShareText();
   const status = document.getElementById('shareStatus');
