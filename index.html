@@ -73,10 +73,25 @@
       .share-row{grid-template-columns:1fr}
     }
 
-  </style>
+  
+    .praise-line{min-height:40px;display:flex;align-items:center;justify-content:center;text-align:center;
+      font-weight:950;font-size:18px;color:#7a4d00;margin:2px 0 10px;opacity:0;transform:translateY(-4px);
+      transition:.2s ease}
+    .praise-line.show{opacity:1;transform:translateY(0)}
+    .answer.correct-flash{border-color:#12b76a!important;background:#ecfdf3!important}
+    .answer.wrong-flash{border-color:#f04438!important;background:#fef3f2!important}
+    .answer.correct-answer{border-color:#12b76a!important;background:#ecfdf3!important}
+    .stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}
+    .stat-card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px 8px;text-align:center}
+    .stat-card small{display:block;color:#667085;font-weight:800;font-size:10px}
+    .stat-card strong{display:block;font-size:17px;margin-top:3px}
+    .percentile{font-size:14px;font-weight:900;color:#475467;margin-top:4px}
+    #shareCanvas{display:block;width:100%;height:auto}
+
+</style>
 </head>
 <body>
-  <div class="wrap">
+<div class="wrap">
     <section id="home" class="screen active">
       <div class="brand">乗り換え<span class="rush">RUSH</span></div>
       <div class="home-card hero">
@@ -113,6 +128,13 @@
           </div>
         </div>
 
+        <div class="stats-strip">
+          <div class="stat-card"><small>プレイ回数</small><strong id="statPlays">0</strong></div>
+          <div class="stat-card"><small>総正解数</small><strong id="statCorrect">0</strong></div>
+          <div class="stat-card"><small>最高コンボ</small><strong id="statCombo">0</strong></div>
+          <div class="stat-card"><small>最高偏差値</small><strong id="statDev">—</strong></div>
+        </div>
+
       </div>
     </section>
 
@@ -126,12 +148,14 @@
         </div>
       </div>
       <div class="back-row"><button class="ghost" onclick="goHome()">トップへ戻る</button></div>
+      <div id="praiseLine" class="praise-line"></div>
       <div class="question-strip"><span class="qbadge" id="modeBadge">初級</span><span><span id="from"></span>駅から<span id="to"></span>駅まで、最速になる乗換ルートはどれ？</span></div>
       <div class="choice-stage">
         <div class="route-summary"><div class="small">START → GOAL</div><div class="pair"><span id="fromBig"></span><span class="arrow">→</span><span id="toBig"></span></div><div class="instruction">最速になる乗換ルートを選んでください</div></div>
         <div id="route"></div>
         <div id="choices" class="grid two"></div>
         <div class="choice-note">正解だと思う選択肢をクリックしてください</div>
+
       </div>
     </section>
 
@@ -140,11 +164,11 @@
       <div class="result-card">
         <div id="finalMode" class="mode-chip">初級モード</div>
         <div class="subtle">TOKYO SCORE</div><div id="deviation" class="bigscore">東京偏差値 50</div>
-        <div id="titleBadge" class="title-badge">東京移動マスター</div>
+        <div id="titleBadge" class="title-badge">東京移動マスター</div><div id="percentile" class="percentile"></div>
         <div id="finalGrade" class="grade"></div>
         <div id="bestResult" class="best-result">ベスト記録 —</div>
         <div class="subtle" style="margin-top:12px">総合スコア</div><div id="totalScore" style="font-size:36px;font-weight:950;margin-top:4px">0点</div>
-        <div id="details"></div>
+        <canvas id="shareCanvas" width="1080" height="1350" style="display:none"></canvas><div id="details"></div>
         <div class="share-row">
           <button class="primary" onclick="shareResult()">結果をシェア</button>
           <button class="ghost" onclick="startGame(currentMode)">もう一度遊ぶ</button>
@@ -377,7 +401,7 @@ function calcChosenRouteTime(p){
   }
   return {time:total, segments};
 }
-const questionPool = [{"from":"上野","to":"大手町"},{"from":"下北沢","to":"中野"},{"from":"代々木上原","to":"吉祥寺"},{"from":"品川","to":"御茶ノ水"},{"from":"大崎","to":"川崎"},{"from":"市ヶ谷","to":"日本橋"},{"from":"恵比寿","to":"横浜"},{"from":"新宿","to":"表参道"},{"from":"東京","to":"飯田橋"},{"from":"池袋","to":"赤坂見附"},{"from":"秋葉原","to":"銀座"},{"from":"中野","to":"渋谷"},{"from":"吉祥寺","to":"目黒"},{"from":"大手町","to":"新橋"},{"from":"川崎","to":"恵比寿"},{"from":"御茶ノ水","to":"上野"},{"from":"新橋","to":"下北沢"},{"from":"日本橋","to":"代々木上原"},{"from":"横浜","to":"市ヶ谷"},{"from":"表参道","to":"大崎"},{"from":"赤坂見附","to":"品川"},{"from":"銀座","to":"池袋"},{"from":"渋谷","to":"飯田橋"},{"from":"目黒","to":"下北沢"},{"from":"代々木上原","to":"東京"},{"from":"大手町","to":"秋葉原"},{"from":"日本橋","to":"新宿"},{"from":"飯田橋","to":"上野"},{"from":"中野","to":"大崎"},{"from":"吉祥寺","to":"恵比寿"},{"from":"品川","to":"銀座"},{"from":"川崎","to":"御茶ノ水"},{"from":"市ヶ谷","to":"池袋"},{"from":"東京","to":"表参道"},{"from":"横浜","to":"目黒"},{"from":"秋葉原","to":"赤坂見附"},{"from":"御茶ノ水","to":"新橋"},{"from":"渋谷","to":"代々木上原"},{"from":"上野","to":"市ヶ谷"},{"from":"下北沢","to":"横浜"},{"from":"大崎","to":"吉祥寺"},{"from":"池袋","to":"中野"},{"from":"目黒","to":"川崎"},{"from":"恵比寿","to":"表参道"},{"from":"赤坂見附","to":"飯田橋"},{"from":"品川","to":"大手町"},{"from":"新橋","to":"代々木上原"},{"from":"日本橋","to":"東京"},{"from":"銀座","to":"中野"},{"from":"大手町","to":"渋谷"},{"from":"表参道","to":"吉祥寺"},{"from":"飯田橋","to":"下北沢"},{"from":"大崎","to":"市ヶ谷"},{"from":"川崎","to":"赤坂見附"},{"from":"御茶ノ水","to":"横浜"},{"from":"下北沢","to":"恵比寿"},{"from":"代々木上原","to":"池袋"},{"from":"吉祥寺","to":"銀座"},{"from":"市ヶ谷","to":"渋谷"},{"from":"目黒","to":"御茶ノ水"},{"from":"横浜","to":"大手町"},{"from":"表参道","to":"目黒"},{"from":"赤坂見附","to":"大崎"},{"from":"銀座","to":"川崎"},{"from":"池袋","to":"飯田橋"},{"from":"中野","to":"代々木上原"},{"from":"恵比寿","to":"赤坂見附"},{"from":"渋谷","to":"御茶ノ水"},{"from":"飯田橋","to":"大崎"},{"from":"下北沢","to":"市ヶ谷"},{"from":"中野","to":"横浜"},{"from":"吉祥寺","to":"池袋"},{"from":"大手町","to":"川崎"},{"from":"御茶ノ水","to":"銀座"},{"from":"横浜","to":"表参道"},{"from":"赤坂見附","to":"目黒"},{"from":"大崎","to":"下北沢"},{"from":"市ヶ谷","to":"大手町"},{"from":"代々木上原","to":"飯田橋"},{"from":"池袋","to":"表参道"},{"from":"銀座","to":"横浜"},{"from":"赤坂見附","to":"中野"},{"from":"飯田橋","to":"銀座"},{"from":"横浜","to":"吉祥寺"},{"from":"下北沢","to":"御茶ノ水"},{"from":"代々木上原","to":"市ヶ谷"},{"from":"吉祥寺","to":"赤坂見附"},{"from":"御茶ノ水","to":"大手町"},{"from":"池袋","to":"下北沢"},{"from":"市ヶ谷","to":"赤坂見附"},{"from":"御茶ノ水","to":"代々木上原"},{"from":"池袋","to":"御茶ノ水"},{"from":"赤坂見附","to":"下北沢"},{"from":"代々木上原","to":"赤坂見附"},{"from":"横浜","to":"赤坂見附"},{"from":"赤坂見附","to":"御茶ノ水"},{"from":"新宿","to":"日本橋"},{"from":"東京","to":"日本橋"},{"from":"表参道","to":"新宿"},{"from":"秋葉原","to":"大手町"}];
+const questionPool = [{"from":"上野","to":"大手町","masterTransfer":"東京","masterRoute":"上野 → 東京 → 大手町","masterLine":"JR山手線 → 東京メトロ丸ノ内線","masterTime":9.0},{"from":"下北沢","to":"中野","masterTransfer":"新宿","masterRoute":"下北沢 → 新宿 → 中野","masterLine":"小田急小田原線 → JR中央線快速","masterTime":13.0},{"from":"代々木上原","to":"吉祥寺","masterTransfer":"下北沢","masterRoute":"代々木上原 → 下北沢 → 吉祥寺","masterLine":"小田急小田原線 → 京王井の頭線","masterTime":20.0},{"from":"品川","to":"御茶ノ水","masterTransfer":"東京","masterRoute":"品川 → 東京 → 御茶ノ水","masterLine":"JR東海道線 → JR中央線快速","masterTime":13.0},{"from":"大崎","to":"川崎","masterTransfer":"品川","masterRoute":"大崎 → 品川 → 川崎","masterLine":"JR山手線 → JR京浜東北線","masterTime":12.0},{"from":"市ヶ谷","to":"日本橋","masterTransfer":"飯田橋","masterRoute":"市ヶ谷 → 飯田橋 → 日本橋","masterLine":"JR中央・総武線 → 東京メトロ東西線","masterTime":10.0},{"from":"恵比寿","to":"川崎","masterTransfer":"品川","masterRoute":"恵比寿 → 品川 → 川崎","masterLine":"JR山手線 → JR東海道線","masterTime":21.0},{"from":"新宿","to":"表参道","masterTransfer":"渋谷","masterRoute":"新宿 → 渋谷 → 表参道","masterLine":"JR埼京線 → 東京メトロ銀座線","masterTime":10.0},{"from":"東京","to":"飯田橋","masterTransfer":"大手町","masterRoute":"東京 → 大手町 → 飯田橋","masterLine":"東京メトロ丸ノ内線 → 東京メトロ東西線","masterTime":11.0},{"from":"池袋","to":"代々木上原","masterTransfer":"新宿","masterRoute":"池袋 → 新宿 → 代々木上原","masterLine":"JR埼京線 → 小田急小田原線","masterTime":16.0},{"from":"秋葉原","to":"銀座","masterTransfer":"東京","masterRoute":"秋葉原 → 東京 → 銀座","masterLine":"JR山手線 → 東京メトロ丸ノ内線","masterTime":10.0},{"from":"中野","to":"渋谷","masterTransfer":"新宿","masterRoute":"中野 → 新宿 → 渋谷","masterLine":"JR中央線快速 → JR埼京線","masterTime":10.0},{"from":"吉祥寺","to":"目黒","masterTransfer":"渋谷","masterRoute":"吉祥寺 → 渋谷 → 目黒","masterLine":"京王井の頭線 → JR山手線","masterTime":26.0},{"from":"大手町","to":"新橋","masterTransfer":"東京","masterRoute":"大手町 → 東京 → 新橋","masterLine":"東京メトロ丸ノ内線 → JR東海道線","masterTime":8.0},{"from":"川崎","to":"恵比寿","masterTransfer":"品川","masterRoute":"川崎 → 品川 → 恵比寿","masterLine":"JR京浜東北線 → JR山手線","masterTime":19.0},{"from":"御茶ノ水","to":"上野","masterTransfer":"秋葉原","masterRoute":"御茶ノ水 → 秋葉原 → 上野","masterLine":"JR中央・総武線 → JR山手線","masterTime":8.0},{"from":"新橋","to":"下北沢","masterTransfer":"渋谷","masterRoute":"新橋 → 渋谷 → 下北沢","masterLine":"東京メトロ銀座線 → 京王井の頭線","masterTime":19.0},{"from":"日本橋","to":"代々木上原","masterTransfer":"大手町","masterRoute":"日本橋 → 大手町 → 代々木上原","masterLine":"東京メトロ東西線 → 東京メトロ千代田線","masterTime":21.0},{"from":"横浜","to":"市ヶ谷","masterTransfer":"新宿","masterRoute":"横浜 → 新宿 → 市ヶ谷","masterLine":"JR湘南新宿ライン → JR中央・総武線","masterTime":35.0},{"from":"表参道","to":"大崎","masterTransfer":"渋谷","masterRoute":"表参道 → 渋谷 → 大崎","masterLine":"東京メトロ銀座線 → JR埼京線","masterTime":8.0},{"from":"赤坂見附","to":"品川","masterTransfer":"新橋","masterRoute":"赤坂見附 → 新橋 → 品川","masterLine":"東京メトロ銀座線 → JR東海道線","masterTime":12.0},{"from":"銀座","to":"吉祥寺","masterTransfer":"新宿","masterRoute":"銀座 → 新宿 → 吉祥寺","masterLine":"東京メトロ丸ノ内線 → JR中央線快速","masterTime":31.0},{"from":"渋谷","to":"飯田橋","masterTransfer":"新宿","masterRoute":"渋谷 → 新宿 → 飯田橋","masterLine":"JR埼京線 → JR中央・総武線","masterTime":13.0},{"from":"目黒","to":"下北沢","masterTransfer":"渋谷","masterRoute":"目黒 → 渋谷 → 下北沢","masterLine":"JR山手線 → 京王井の頭線","masterTime":10.0},{"from":"代々木上原","to":"東京","masterTransfer":"大手町","masterRoute":"代々木上原 → 大手町 → 東京","masterLine":"東京メトロ千代田線 → 東京メトロ丸ノ内線","masterTime":20.0},{"from":"大手町","to":"秋葉原","masterTransfer":"東京","masterRoute":"大手町 → 東京 → 秋葉原","masterLine":"東京メトロ丸ノ内線 → JR山手線","masterTime":9.0},{"from":"日本橋","to":"新宿","masterTransfer":"飯田橋","masterRoute":"日本橋 → 飯田橋 → 新宿","masterLine":"東京メトロ東西線 → JR中央・総武線","masterTime":16.0},{"from":"飯田橋","to":"上野","masterTransfer":"秋葉原","masterRoute":"飯田橋 → 秋葉原 → 上野","masterLine":"JR中央・総武線 → JR山手線","masterTime":10.0},{"from":"中野","to":"大崎","masterTransfer":"新宿","masterRoute":"中野 → 新宿 → 大崎","masterLine":"JR中央線快速 → JR埼京線","masterTime":16.0},{"from":"吉祥寺","to":"恵比寿","masterTransfer":"渋谷","masterRoute":"吉祥寺 → 渋谷 → 恵比寿","masterLine":"京王井の頭線 → JR山手線","masterTime":23.0},{"from":"品川","to":"銀座","masterTransfer":"新橋","masterRoute":"品川 → 新橋 → 銀座","masterLine":"JR東海道線 → 東京メトロ銀座線","masterTime":9.0},{"from":"川崎","to":"御茶ノ水","masterTransfer":"東京","masterRoute":"川崎 → 東京 → 御茶ノ水","masterLine":"JR東海道線 → JR中央線快速","masterTime":22.0},{"from":"市ヶ谷","to":"下北沢","masterTransfer":"新宿","masterRoute":"市ヶ谷 → 新宿 → 下北沢","masterLine":"JR中央・総武線 → 小田急小田原線","masterTime":16.0},{"from":"東京","to":"表参道","masterTransfer":"大手町","masterRoute":"東京 → 大手町 → 表参道","masterLine":"東京メトロ丸ノ内線 → 東京メトロ千代田線","masterTime":13.0},{"from":"横浜","to":"目黒","masterTransfer":"大崎","masterRoute":"横浜 → 大崎 → 目黒","masterLine":"JR湘南新宿ライン → JR山手線","masterTime":22.0},{"from":"秋葉原","to":"赤坂見附","masterTransfer":"東京","masterRoute":"秋葉原 → 東京 → 赤坂見附","masterLine":"JR山手線 → 東京メトロ丸ノ内線","masterTime":12.0},{"from":"御茶ノ水","to":"新橋","masterTransfer":"東京","masterRoute":"御茶ノ水 → 東京 → 新橋","masterLine":"JR中央線快速 → JR東海道線","masterTime":9.0},{"from":"渋谷","to":"代々木上原","masterTransfer":"下北沢","masterRoute":"渋谷 → 下北沢 → 代々木上原","masterLine":"京王井の頭線 → 小田急小田原線","masterTime":9.0},{"from":"上野","to":"市ヶ谷","masterTransfer":"秋葉原","masterRoute":"上野 → 秋葉原 → 市ヶ谷","masterLine":"JR山手線 → JR中央・総武線","masterTime":12.0},{"from":"下北沢","to":"横浜","masterTransfer":"渋谷","masterRoute":"下北沢 → 渋谷 → 横浜","masterLine":"京王井の頭線 → JR湘南新宿ライン","masterTime":29.0},{"from":"大崎","to":"吉祥寺","masterTransfer":"新宿","masterRoute":"大崎 → 新宿 → 吉祥寺","masterLine":"JR埼京線 → JR中央線快速","masterTime":27.0},{"from":"池袋","to":"中野","masterTransfer":"新宿","masterRoute":"池袋 → 新宿 → 中野","masterLine":"JR埼京線 → JR中央線快速","masterTime":10.0},{"from":"目黒","to":"川崎","masterTransfer":"品川","masterRoute":"目黒 → 品川 → 川崎","masterLine":"JR山手線 → JR京浜東北線","masterTime":16.0},{"from":"恵比寿","to":"表参道","masterTransfer":"渋谷","masterRoute":"恵比寿 → 渋谷 → 表参道","masterLine":"JR山手線 → 東京メトロ銀座線","masterTime":8.0},{"from":"赤坂見附","to":"飯田橋","masterTransfer":"大手町","masterRoute":"赤坂見附 → 大手町 → 飯田橋","masterLine":"東京メトロ丸ノ内線 → 東京メトロ東西線","masterTime":15.0},{"from":"品川","to":"大手町","masterTransfer":"東京","masterRoute":"品川 → 東京 → 大手町","masterLine":"JR東海道線 → 東京メトロ丸ノ内線","masterTime":10.0},{"from":"新橋","to":"代々木上原","masterTransfer":"表参道","masterRoute":"新橋 → 表参道 → 代々木上原","masterLine":"東京メトロ銀座線 → 東京メトロ千代田線","masterTime":19.0},{"from":"日本橋","to":"東京","masterTransfer":"大手町","masterRoute":"日本橋 → 大手町 → 東京","masterLine":"東京メトロ東西線 → 東京メトロ丸ノ内線","masterTime":7.0},{"from":"銀座","to":"中野","masterTransfer":"新宿","masterRoute":"銀座 → 新宿 → 中野","masterLine":"東京メトロ丸ノ内線 → JR中央線快速","masterTime":19.0},{"from":"表参道","to":"池袋","masterTransfer":"渋谷","masterRoute":"表参道 → 渋谷 → 池袋","masterLine":"東京メトロ銀座線 → JR埼京線","masterTime":16.0},{"from":"表参道","to":"吉祥寺","masterTransfer":"渋谷","masterRoute":"表参道 → 渋谷 → 吉祥寺","masterLine":"東京メトロ銀座線 → 京王井の頭線","masterTime":23.0},{"from":"飯田橋","to":"下北沢","masterTransfer":"新宿","masterRoute":"飯田橋 → 新宿 → 下北沢","masterLine":"JR中央・総武線 → 小田急小田原線","masterTime":16.0},{"from":"大崎","to":"市ヶ谷","masterTransfer":"新宿","masterRoute":"大崎 → 新宿 → 市ヶ谷","masterLine":"JR埼京線 → JR中央・総武線","masterTime":17.0},{"from":"川崎","to":"赤坂見附","masterTransfer":"新橋","masterRoute":"川崎 → 新橋 → 赤坂見附","masterLine":"JR東海道線 → 東京メトロ銀座線","masterTime":21.0},{"from":"御茶ノ水","to":"横浜","masterTransfer":"東京","masterRoute":"御茶ノ水 → 東京 → 横浜","masterLine":"JR中央線快速 → JR東海道線","masterTime":30.0},{"from":"下北沢","to":"恵比寿","masterTransfer":"渋谷","masterRoute":"下北沢 → 渋谷 → 恵比寿","masterLine":"京王井の頭線 → JR山手線","masterTime":10.0},{"from":"代々木上原","to":"池袋","masterTransfer":"新宿","masterRoute":"代々木上原 → 新宿 → 池袋","masterLine":"小田急小田原線 → JR埼京線","masterTime":17.0},{"from":"吉祥寺","to":"銀座","masterTransfer":"新宿","masterRoute":"吉祥寺 → 新宿 → 銀座","masterLine":"JR中央線快速 → 東京メトロ丸ノ内線","masterTime":30.0},{"from":"市ヶ谷","to":"渋谷","masterTransfer":"新宿","masterRoute":"市ヶ谷 → 新宿 → 渋谷","masterLine":"JR中央・総武線 → JR埼京線","masterTime":11.0},{"from":"目黒","to":"御茶ノ水","masterTransfer":"飯田橋","masterRoute":"目黒 → 飯田橋 → 御茶ノ水","masterLine":"東京メトロ南北線 → JR中央・総武線","masterTime":19.0},{"from":"横浜","to":"大手町","masterTransfer":"東京","masterRoute":"横浜 → 東京 → 大手町","masterLine":"JR東海道線 → 東京メトロ丸ノ内線","masterTime":27.0},{"from":"表参道","to":"目黒","masterTransfer":"渋谷","masterRoute":"表参道 → 渋谷 → 目黒","masterLine":"東京メトロ銀座線 → JR山手線","masterTime":10.0},{"from":"赤坂見附","to":"大崎","masterTransfer":"渋谷","masterRoute":"赤坂見附 → 渋谷 → 大崎","masterLine":"東京メトロ銀座線 → JR埼京線","masterTime":14.0},{"from":"銀座","to":"川崎","masterTransfer":"新橋","masterRoute":"銀座 → 新橋 → 川崎","masterLine":"東京メトロ銀座線 → JR東海道線","masterTime":18.0},{"from":"下北沢","to":"赤坂見附","masterTransfer":"渋谷","masterRoute":"下北沢 → 渋谷 → 赤坂見附","masterLine":"京王井の頭線 → 東京メトロ銀座線","masterTime":16.0},{"from":"中野","to":"代々木上原","masterTransfer":"新宿","masterRoute":"中野 → 新宿 → 代々木上原","masterLine":"JR中央線快速 → 小田急小田原線","masterTime":17.0},{"from":"恵比寿","to":"赤坂見附","masterTransfer":"渋谷","masterRoute":"恵比寿 → 渋谷 → 赤坂見附","masterLine":"JR山手線 → 東京メトロ銀座線","masterTime":10.0},{"from":"渋谷","to":"御茶ノ水","masterTransfer":"新宿","masterRoute":"渋谷 → 新宿 → 御茶ノ水","masterLine":"JR埼京線 → JR中央線快速","masterTime":15.0},{"from":"飯田橋","to":"大崎","masterTransfer":"新宿","masterRoute":"飯田橋 → 新宿 → 大崎","masterLine":"JR中央・総武線 → JR埼京線","masterTime":19.0},{"from":"下北沢","to":"市ヶ谷","masterTransfer":"新宿","masterRoute":"下北沢 → 新宿 → 市ヶ谷","masterLine":"小田急小田原線 → JR中央・総武線","masterTime":14.0},{"from":"中野","to":"横浜","masterTransfer":"新宿","masterRoute":"中野 → 新宿 → 横浜","masterLine":"JR中央線快速 → JR湘南新宿ライン","masterTime":34.0},{"from":"吉祥寺","to":"池袋","masterTransfer":"新宿","masterRoute":"吉祥寺 → 新宿 → 池袋","masterLine":"JR中央線快速 → JR埼京線","masterTime":21.0},{"from":"大手町","to":"川崎","masterTransfer":"東京","masterRoute":"大手町 → 東京 → 川崎","masterLine":"東京メトロ丸ノ内線 → JR東海道線","masterTime":19.0},{"from":"御茶ノ水","to":"品川","masterTransfer":"東京","masterRoute":"御茶ノ水 → 東京 → 品川","masterLine":"JR中央線快速 → JR東海道線","masterTime":14.0},{"from":"横浜","to":"表参道","masterTransfer":"渋谷","masterRoute":"横浜 → 渋谷 → 表参道","masterLine":"JR湘南新宿ライン → 東京メトロ銀座線","masterTime":26.0},{"from":"赤坂見附","to":"目黒","masterTransfer":"渋谷","masterRoute":"赤坂見附 → 渋谷 → 目黒","masterLine":"東京メトロ銀座線 → JR山手線","masterTime":13.0},{"from":"大崎","to":"下北沢","masterTransfer":"渋谷","masterRoute":"大崎 → 渋谷 → 下北沢","masterLine":"JR埼京線 → 京王井の頭線","masterTime":11.0},{"from":"市ヶ谷","to":"大手町","masterTransfer":"飯田橋","masterRoute":"市ヶ谷 → 飯田橋 → 大手町","masterLine":"JR中央・総武線 → 東京メトロ東西線","masterTime":8.0},{"from":"代々木上原","to":"飯田橋","masterTransfer":"新宿","masterRoute":"代々木上原 → 新宿 → 飯田橋","masterLine":"小田急小田原線 → JR中央・総武線","masterTime":20.0},{"from":"池袋","to":"表参道","masterTransfer":"渋谷","masterRoute":"池袋 → 渋谷 → 表参道","masterLine":"JR埼京線 → 東京メトロ銀座線","masterTime":12.0},{"from":"銀座","to":"横浜","masterTransfer":"新橋","masterRoute":"銀座 → 新橋 → 横浜","masterLine":"東京メトロ銀座線 → JR東海道線","masterTime":26.0},{"from":"赤坂見附","to":"中野","masterTransfer":"新宿","masterRoute":"赤坂見附 → 新宿 → 中野","masterLine":"東京メトロ丸ノ内線 → JR中央線快速","masterTime":13.0},{"from":"飯田橋","to":"銀座","masterTransfer":"大手町","masterRoute":"飯田橋 → 大手町 → 銀座","masterLine":"東京メトロ東西線 → 東京メトロ丸ノ内線","masterTime":9.0},{"from":"横浜","to":"吉祥寺","masterTransfer":"新宿","masterRoute":"横浜 → 新宿 → 吉祥寺","masterLine":"JR湘南新宿ライン → JR中央線快速","masterTime":45.0},{"from":"下北沢","to":"御茶ノ水","masterTransfer":"新宿","masterRoute":"下北沢 → 新宿 → 御茶ノ水","masterLine":"小田急小田原線 → JR中央線快速","masterTime":18.0},{"from":"代々木上原","to":"市ヶ谷","masterTransfer":"新宿","masterRoute":"代々木上原 → 新宿 → 市ヶ谷","masterLine":"小田急小田原線 → JR中央・総武線","masterTime":18.0},{"from":"吉祥寺","to":"赤坂見附","masterTransfer":"新宿","masterRoute":"吉祥寺 → 新宿 → 赤坂見附","masterLine":"JR中央線快速 → 東京メトロ丸ノ内線","masterTime":24.0},{"from":"中野","to":"赤坂見附","masterTransfer":"新宿","masterRoute":"中野 → 新宿 → 赤坂見附","masterLine":"JR中央線快速 → 東京メトロ丸ノ内線","masterTime":14.0},{"from":"池袋","to":"下北沢","masterTransfer":"新宿","masterRoute":"池袋 → 新宿 → 下北沢","masterLine":"JR埼京線 → 小田急小田原線","masterTime":13.0},{"from":"市ヶ谷","to":"赤坂見附","masterTransfer":"新宿","masterRoute":"市ヶ谷 → 新宿 → 赤坂見附","masterLine":"JR中央・総武線 → 東京メトロ丸ノ内線","masterTime":14.0},{"from":"御茶ノ水","to":"代々木上原","masterTransfer":"新宿","masterRoute":"御茶ノ水 → 新宿 → 代々木上原","masterLine":"JR中央線快速 → 小田急小田原線","masterTime":22.0},{"from":"吉祥寺","to":"品川","masterTransfer":"新宿","masterRoute":"吉祥寺 → 新宿 → 品川","masterLine":"JR中央線快速 → JR山手線","masterTime":34.0},{"from":"赤坂見附","to":"下北沢","masterTransfer":"渋谷","masterRoute":"赤坂見附 → 渋谷 → 下北沢","masterLine":"東京メトロ銀座線 → 京王井の頭線","masterTime":13.0},{"from":"代々木上原","to":"赤坂見附","masterTransfer":"表参道","masterRoute":"代々木上原 → 表参道 → 赤坂見附","masterLine":"東京メトロ千代田線 → 東京メトロ銀座線","masterTime":13.0},{"from":"横浜","to":"赤坂見附","masterTransfer":"新橋","masterRoute":"横浜 → 新橋 → 赤坂見附","masterLine":"JR東海道線 → 東京メトロ銀座線","masterTime":29.0},{"from":"目黒","to":"横浜","masterTransfer":"品川","masterRoute":"目黒 → 品川 → 横浜","masterLine":"JR山手線 → JR東海道線","masterTime":26.0},{"from":"新宿","to":"日本橋","masterTransfer":"飯田橋","masterRoute":"新宿 → 飯田橋 → 日本橋","masterLine":"JR中央・総武線 → 東京メトロ東西線","masterTime":16.0},{"from":"東京","to":"日本橋","masterTransfer":"大手町","masterRoute":"東京 → 大手町 → 日本橋","masterLine":"東京メトロ丸ノ内線 → 東京メトロ東西線","masterTime":7.0},{"from":"表参道","to":"新宿","masterTransfer":"渋谷","masterRoute":"表参道 → 渋谷 → 新宿","masterLine":"東京メトロ銀座線 → JR埼京線","masterTime":10.0},{"from":"秋葉原","to":"大手町","masterTransfer":"東京","masterRoute":"秋葉原 → 東京 → 大手町","masterLine":"JR山手線 → 東京メトロ丸ノ内線","masterTime":9.0}];
 function buildQuestionPool(minTransfers, maxTransfers=Infinity){
   const pool = [];
   for(const from of stations){
@@ -405,6 +429,9 @@ const modeConfig = {
 let currentMode = "beginner";
 let lastDeviation = 50;
 let lastTitle = "";
+let combo = 0;
+let maxComboThisGame = 0;
+let pendingPraise = "";
 let gameQuestions = [];
 let q = 0;
 let total = 0;
@@ -464,6 +491,79 @@ function titleForDeviation(dev){
   return "東京迷子";
 }
 
+
+function getProfile(){
+  try{
+    return JSON.parse(localStorage.getItem("norikaeRushProfile")) || {plays:0,correct:0,maxCombo:0,maxDev:0};
+  }catch(e){ return {plays:0,correct:0,maxCombo:0,maxDev:0}; }
+}
+function saveProfile(p){
+  try{ localStorage.setItem("norikaeRushProfile", JSON.stringify(p)); }catch(e){}
+}
+function renderProfile(){
+  const p=getProfile();
+  const a=document.getElementById("statPlays"),b=document.getElementById("statCorrect"),
+        c=document.getElementById("statCombo"),d=document.getElementById("statDev");
+  if(a)a.textContent=p.plays||0;if(b)b.textContent=p.correct||0;if(c)c.textContent=p.maxCombo||0;
+  if(d)d.textContent=p.maxDev?("偏差値 "+p.maxDev):"—";
+}
+function percentileForDeviation(dev){
+  const table = {
+    20:99.9, 21:99.8, 22:99.7, 23:99.6, 24:99.5,
+    25:99.4, 26:99.2, 27:98.9, 28:98.6, 29:98.2,
+    30:97.7, 31:97.1, 32:96.4, 33:95.5, 34:94.5,
+    35:93.3, 36:91.9, 37:90.3, 38:88.5, 39:86.4,
+    40:84.1, 41:81.6, 42:78.8, 43:75.8, 44:72.6,
+    45:69.1, 46:65.5, 47:61.8, 48:57.9, 49:54.0,
+    50:50.0,
+    51:46.0, 52:42.1, 53:38.2, 54:34.5, 55:30.9,
+    56:27.4, 57:24.2, 58:21.2, 59:18.4, 60:15.9,
+    61:13.6, 62:11.5, 63:9.7, 64:8.1, 65:6.7,
+    66:5.5, 67:4.5, 68:3.6, 69:2.9, 70:2.3
+  };
+  const d=Math.max(20,Math.min(70,Math.round(dev)));
+  return table[d];
+}
+function formatTopPercent(p){
+  if(p < 1) return p.toFixed(1);
+  if(p < 10) return p.toFixed(1).replace(/\.0$/,"");
+  return Math.round(p).toString();
+}
+
+function showPendingPraise(){
+  const el=document.getElementById("praiseLine");
+  if(!el) return;
+  if(!pendingPraise){
+    el.textContent="";
+    el.classList.remove("show");
+    return;
+  }
+  el.textContent=pendingPraise;
+  el.classList.add("show");
+  pendingPraise="";
+  setTimeout(()=>el.classList.remove("show"),1800);
+}
+
+function drawShareCard(){
+  const c=document.getElementById("shareCanvas"); if(!c)return;
+  const ctx=c.getContext("2d");
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle="#f7f8fa";ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle="#101828";ctx.textAlign="center";
+  ctx.font="900 62px sans-serif";ctx.fillText("乗り換え RUSH",540,150);
+  ctx.fillStyle="#d92d20";ctx.font="italic 900 62px sans-serif";ctx.fillText("RUSH",720,150);
+  ctx.fillStyle="#667085";ctx.font="800 34px sans-serif";ctx.fillText(modeConfig[currentMode].label,540,245);
+  ctx.fillStyle="#101828";ctx.font="900 44px sans-serif";ctx.fillText("東京偏差値",540,385);
+  ctx.font="1000 190px sans-serif";ctx.fillText(String(lastDeviation),540,585);
+  ctx.fillStyle="#7a4d00";ctx.font="900 58px sans-serif";ctx.fillText("「"+lastTitle+"」",540,705);
+  const correctCount=records.filter(r=>r.correct).length;
+  ctx.fillStyle="#344054";ctx.font="900 44px sans-serif";ctx.fillText(correctCount+" / 5 正解",540,815);
+  ctx.fillStyle="#667085";ctx.font="800 34px sans-serif";ctx.fillText("上位 約"+formatTopPercent(percentileForDeviation(lastDeviation))+"%",540,885);
+  ctx.strokeStyle="#f0b84b";ctx.lineWidth=8;ctx.strokeRect(90,70,900,1030);
+  ctx.fillStyle="#101828";ctx.font="900 38px sans-serif";ctx.fillText("あなたの東京移動力は？",540,1050);
+  ctx.fillStyle="#98a2b3";ctx.font="700 28px sans-serif";ctx.fillText("NORIKAE RUSH",540,1160);
+}
+
 function show(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -478,7 +578,7 @@ function updateTimerRing(){
 
 function startGame(mode="beginner"){
   currentMode = modeConfig[mode] ? mode : "beginner";
-  q = 0; total = 0; records = [];
+  q = 0; total = 0; records = []; combo = 0; maxComboThisGame = 0; pendingPraise = "";
   const sourcePool = modeConfig[currentMode].pool;
   gameQuestions = [...sourcePool]
     .sort(() => Math.random() - 0.5)
@@ -490,10 +590,12 @@ function startGame(mode="beginner"){
 function newQuestion(){
   q++;
   document.getElementById('qnum').textContent = q;
+  showPendingPraise();
 
   const picked = gameQuestions[q - 1];
   currentFrom = picked.from;
   currentTo = picked.to;
+  window.currentMaster = picked;
 
   path = [currentFrom];
   timeLeft = 20;
@@ -538,6 +640,12 @@ function prepareQuestionOptions(){
     time: best.distance,
     correct: true
   };
+  if(currentMode==="beginner" && window.currentMaster && window.currentMaster.masterTransfer){
+    const mt=window.currentMaster.masterTransfer.replace(/駅$/,"");
+    currentCorrect.label=mt+"で乗り換え";
+    currentCorrect.route=[currentFrom,mt,currentTo];
+    if(Number.isFinite(window.currentMaster.masterTime)) currentCorrect.time=window.currentMaster.masterTime;
+  }
 
   const alternatives = [];
   const seen = new Set([currentCorrect.label]);
@@ -618,6 +726,19 @@ function answerChoice(index){
   clearInterval(timerId);
   const chosen = currentOptions[index];
   const correct = !!chosen.correct;
+
+  if(correct){
+    combo++;
+    maxComboThisGame=Math.max(maxComboThisGame,combo);
+    if(combo===1) pendingPraise="素晴らしい！ 1 COMBO・いいね！";
+    else if(combo===2) pendingPraise="最高！ 2 COMBO！";
+    else if(combo===3) pendingPraise="すごい！ 3 COMBO！";
+    else if(combo===4) pendingPraise="完璧！ 4 COMBO！";
+    else pendingPraise="完全制覇！ 5 COMBO！";
+  }else{
+    combo=0;
+    pendingPraise="";
+  }
 
   path = chosen.route ? chosen.route.slice() : [currentFrom];
   const chosenCalc = calcChosenRouteTime(path);
@@ -738,6 +859,14 @@ function showFinal(){
   lastTitle = titleForDeviation(dev);
   document.getElementById('deviation').textContent = "東京偏差値 " + dev;
   document.getElementById('titleBadge').textContent = lastTitle;
+  document.getElementById('percentile').textContent = "上位 約" + formatTopPercent(percentileForDeviation(dev)) + "%";
+  const profile=getProfile();
+  profile.plays=(profile.plays||0)+1;
+  profile.correct=(profile.correct||0)+correctCount;
+  profile.maxCombo=Math.max(profile.maxCombo||0,maxComboThisGame);
+  profile.maxDev=Math.max(profile.maxDev||0,dev);
+  saveProfile(profile);
+  renderProfile();
 
   const saved = saveBest(currentMode, dev, total, correctCount);
   const bestEl = document.getElementById('bestResult');
@@ -800,7 +929,8 @@ function buildShareText(){
   return `乗り換えRUSH 🚃
 ${modeConfig[currentMode].label}
 東京偏差値 ${lastDeviation}「${lastTitle}」
-5問中${correctCount}問正解！
+5問中${correctCount}問正解・上位約${formatTopPercent(percentileForDeviation(lastDeviation))}%！
+最高${maxComboThisGame}コンボ
 あなたの東京移動力は？`;
 }
 
@@ -808,31 +938,34 @@ async function shareResult(){
   const text = buildShareText();
   const status = document.getElementById('shareStatus');
   const url = location.href.split('?')[0].split('#')[0];
+  const canvas=document.getElementById("shareCanvas");
 
-  if(navigator.share){
-    try{
-      await navigator.share({
-        title:"乗り換えRUSH",
-        text,
-        url
-      });
-      if(status) status.textContent = "シェアしました";
-      return;
-    }catch(e){
-      if(e && e.name === "AbortError") return;
-    }
+  let file=null;
+  if(canvas){
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
+    if(blob) file=new File([blob],"norikae-rush-result.png",{type:"image/png"});
   }
 
-  const fallback = text + "\n" + url;
   try{
-    await navigator.clipboard.writeText(fallback);
-    if(status) status.textContent = "結果をコピーしました。SNSに貼り付けてシェアできます。";
+    if(navigator.share){
+      const data={title:"乗り換えRUSH",text,url};
+      if(file && navigator.canShare && navigator.canShare({files:[file]})) data.files=[file];
+      await navigator.share(data);
+      if(status)status.textContent="シェアしました";
+      return;
+    }
   }catch(e){
-    if(status) status.textContent = "このブラウザでは自動コピーできませんでした。";
+    if(e && e.name==="AbortError")return;
   }
+
+  // PC fallback: open X composer; also copy full result for Instagram/LINE etc.
+  try{ await navigator.clipboard.writeText(text+"\n"+url); }catch(e){}
+  const xUrl="https://twitter.com/intent/tweet?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(url);
+  window.open(xUrl,"_blank","noopener");
+  if(status)status.textContent="結果をコピーし、Xの投稿画面を開きました。InstagramやLINEにはコピーした内容を貼り付けられます。";
 }
 
-document.addEventListener("DOMContentLoaded", renderHomeBests);
+document.addEventListener("DOMContentLoaded", ()=>{renderHomeBests();renderProfile();});
 
 </script>
 </body>
