@@ -48,6 +48,31 @@
 
     .result-card{text-align:center}.bigscore{font-size:clamp(48px,10vw,86px);font-weight:950}.grade{font-size:28px;font-weight:900}.detail-card{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:12px;text-align:left}.detail-head{display:flex;justify-content:space-between;gap:12px}.detail-row{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
     @media(max-width:760px){.wrap{width:min(95vw,1000px);padding-top:16px}.game-head{display:block}.game-logo{margin-bottom:10px}.stats{grid-template-columns:1fr 1fr 1.25fr;gap:7px}.stat{min-height:58px}.stat .value{font-size:20px}.question-strip{font-size:16px}.grid.two{grid-template-columns:1fr}.choice-stage{min-height:0;padding:22px 14px}.route-summary .pair{font-size:34px}.stationBtn{height:56px}.brand{font-size:25px}}
+  
+    .mode-title{font-size:18px;font-weight:950;margin:24px 0 10px}
+    .mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+    .mode-btn{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:18px 14px;text-align:left;transition:.15s ease;box-shadow:0 5px 14px rgba(16,24,40,.04)}
+    .mode-btn:hover{transform:translateY(-2px);border-color:#98a2b3;box-shadow:0 8px 20px rgba(16,24,40,.08)}
+    .mode-btn strong{display:block;font-size:20px;color:#101828;margin-bottom:5px}
+    .mode-btn span{display:block;color:#667085;font-size:12px;line-height:1.55}
+    .best-box{margin:18px auto 0;max-width:720px;background:#f8fafc;border:1px solid var(--line);border-radius:13px;padding:14px 16px;text-align:left}
+    .best-title{font-size:13px;font-weight:900;color:#344054;margin-bottom:8px}
+    .best-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .best-item{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+    .best-item .bmode{font-size:11px;color:#667085;font-weight:800}
+    .best-item .bscore{font-size:18px;font-weight:950;margin-top:3px}
+    .mode-chip{display:inline-flex;align-items:center;background:#eef4ff;color:#1849a9;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:900;margin-bottom:8px}
+    .title-badge{display:inline-flex;align-items:center;justify-content:center;margin:10px auto 2px;background:#fff8e8;border:1px solid #f0b84b;border-radius:999px;padding:8px 16px;font-size:18px;font-weight:950;color:#7a4d00}
+    .best-result{margin:12px auto 0;max-width:420px;background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-weight:800}
+    .share-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px}
+    .share-status{min-height:20px;margin-top:8px;font-size:12px;color:#667085}
+    @media(max-width:760px){
+      .mode-grid{grid-template-columns:1fr}
+      .best-grid{grid-template-columns:1fr 1fr 1fr}
+      .mode-btn{padding:14px}
+      .share-row{grid-template-columns:1fr}
+    }
+
   </style>
 </head>
 <body>
@@ -60,10 +85,34 @@
         <div style="text-align:left;margin:22px auto;max-width:720px;line-height:1.9">
           <strong style="font-size:19px">遊び方</strong>
           <ol>
-            <li>出発駅と目的駅が表示されます。</li><li>4つの候補から最速になる乗換駅を選びます。</li><li>1問20秒、全5問です。</li><li>最後に東京偏差値と総合スコアが表示されます。</li>
+            <li>出発駅と目的駅が表示されます。</li><li>4つの候補から最速になる乗換ルートを選びます。</li><li>1問20秒、全5問です。</li><li>最後に東京偏差値と総合スコアが表示されます。</li>
           </ol>
         </div>
-        <button class="primary" onclick="startGame()">5問チャレンジを始める</button>
+        
+        <div class="mode-title">難易度を選ぶ</div>
+        <div class="mode-grid">
+          <button class="mode-btn" onclick="startGame('beginner')">
+            <strong>初級モード</strong>
+            
+          </button>
+          <button class="mode-btn" onclick="startGame('intermediate')">
+            <strong>中級モード</strong>
+            
+          </button>
+          <button class="mode-btn" onclick="startGame('extreme')">
+            <strong>激むずモード</strong>
+            
+          </button>
+        </div>
+        <div class="best-box">
+          <div class="best-title">あなたのベスト記録</div>
+          <div class="best-grid">
+            <div class="best-item"><div class="bmode">初級</div><div id="best-beginner" class="bscore">—</div></div>
+            <div class="best-item"><div class="bmode">中級</div><div id="best-intermediate" class="bscore">—</div></div>
+            <div class="best-item"><div class="bmode">激むず</div><div id="best-extreme" class="bscore">—</div></div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -77,9 +126,9 @@
         </div>
       </div>
       <div class="back-row"><button class="ghost" onclick="goHome()">トップへ戻る</button></div>
-      <div class="question-strip"><span class="qbadge">問題</span><span><span id="from"></span>駅から<span id="to"></span>駅まで、最速になる乗換駅はどれ？</span></div>
+      <div class="question-strip"><span class="qbadge" id="modeBadge">初級</span><span><span id="from"></span>駅から<span id="to"></span>駅まで、最速になる乗換ルートはどれ？</span></div>
       <div class="choice-stage">
-        <div class="route-summary"><div class="small">START → GOAL</div><div class="pair"><span id="fromBig"></span><span class="arrow">→</span><span id="toBig"></span></div><div class="instruction">最速になる乗換駅を選んでください</div></div>
+        <div class="route-summary"><div class="small">START → GOAL</div><div class="pair"><span id="fromBig"></span><span class="arrow">→</span><span id="toBig"></span></div><div class="instruction">最速になる乗換ルートを選んでください</div></div>
         <div id="route"></div>
         <div id="choices" class="grid two"></div>
         <div class="choice-note">正解だと思う選択肢をクリックしてください</div>
@@ -89,9 +138,19 @@
     <section id="final" class="screen">
       <div class="brand">乗り換え<span class="rush">RUSH</span></div>
       <div class="result-card">
-        <div class="subtle">TOKYO SCORE</div><div id="deviation" class="bigscore">東京偏差値 50</div><div id="finalGrade" class="grade"></div>
+        <div id="finalMode" class="mode-chip">初級モード</div>
+        <div class="subtle">TOKYO SCORE</div><div id="deviation" class="bigscore">東京偏差値 50</div>
+        <div id="titleBadge" class="title-badge">東京移動マスター</div>
+        <div id="finalGrade" class="grade"></div>
+        <div id="bestResult" class="best-result">ベスト記録 —</div>
         <div class="subtle" style="margin-top:12px">総合スコア</div><div id="totalScore" style="font-size:36px;font-weight:950;margin-top:4px">0点</div>
-        <div id="details"></div><div class="grid two" style="margin-top:16px"><button class="primary" onclick="startGame()">もう一度遊ぶ</button><button class="ghost" onclick="goHome()">トップに戻る</button></div>
+        <div id="details"></div>
+        <div class="share-row">
+          <button class="primary" onclick="shareResult()">結果をシェア</button>
+          <button class="ghost" onclick="startGame(currentMode)">もう一度遊ぶ</button>
+          <button class="ghost" onclick="goHome()">トップに戻る</button>
+        </div>
+        <div id="shareStatus" class="share-status"></div>
       </div>
     </section>
   </div>
@@ -318,6 +377,35 @@ function calcChosenRouteTime(p){
   }
   return {time:total, segments};
 }
+const questionPool = [{"from":"上野","to":"大手町"},{"from":"下北沢","to":"中野"},{"from":"代々木上原","to":"吉祥寺"},{"from":"品川","to":"御茶ノ水"},{"from":"大崎","to":"川崎"},{"from":"市ヶ谷","to":"日本橋"},{"from":"恵比寿","to":"横浜"},{"from":"新宿","to":"表参道"},{"from":"東京","to":"飯田橋"},{"from":"池袋","to":"赤坂見附"},{"from":"秋葉原","to":"銀座"},{"from":"中野","to":"渋谷"},{"from":"吉祥寺","to":"目黒"},{"from":"大手町","to":"新橋"},{"from":"川崎","to":"恵比寿"},{"from":"御茶ノ水","to":"上野"},{"from":"新橋","to":"下北沢"},{"from":"日本橋","to":"代々木上原"},{"from":"横浜","to":"市ヶ谷"},{"from":"表参道","to":"大崎"},{"from":"赤坂見附","to":"品川"},{"from":"銀座","to":"池袋"},{"from":"渋谷","to":"飯田橋"},{"from":"目黒","to":"下北沢"},{"from":"代々木上原","to":"東京"},{"from":"大手町","to":"秋葉原"},{"from":"日本橋","to":"新宿"},{"from":"飯田橋","to":"上野"},{"from":"中野","to":"大崎"},{"from":"吉祥寺","to":"恵比寿"},{"from":"品川","to":"銀座"},{"from":"川崎","to":"御茶ノ水"},{"from":"市ヶ谷","to":"池袋"},{"from":"東京","to":"表参道"},{"from":"横浜","to":"目黒"},{"from":"秋葉原","to":"赤坂見附"},{"from":"御茶ノ水","to":"新橋"},{"from":"渋谷","to":"代々木上原"},{"from":"上野","to":"市ヶ谷"},{"from":"下北沢","to":"横浜"},{"from":"大崎","to":"吉祥寺"},{"from":"池袋","to":"中野"},{"from":"目黒","to":"川崎"},{"from":"恵比寿","to":"表参道"},{"from":"赤坂見附","to":"飯田橋"},{"from":"品川","to":"大手町"},{"from":"新橋","to":"代々木上原"},{"from":"日本橋","to":"東京"},{"from":"銀座","to":"中野"},{"from":"大手町","to":"渋谷"},{"from":"表参道","to":"吉祥寺"},{"from":"飯田橋","to":"下北沢"},{"from":"大崎","to":"市ヶ谷"},{"from":"川崎","to":"赤坂見附"},{"from":"御茶ノ水","to":"横浜"},{"from":"下北沢","to":"恵比寿"},{"from":"代々木上原","to":"池袋"},{"from":"吉祥寺","to":"銀座"},{"from":"市ヶ谷","to":"渋谷"},{"from":"目黒","to":"御茶ノ水"},{"from":"横浜","to":"大手町"},{"from":"表参道","to":"目黒"},{"from":"赤坂見附","to":"大崎"},{"from":"銀座","to":"川崎"},{"from":"池袋","to":"飯田橋"},{"from":"中野","to":"代々木上原"},{"from":"恵比寿","to":"赤坂見附"},{"from":"渋谷","to":"御茶ノ水"},{"from":"飯田橋","to":"大崎"},{"from":"下北沢","to":"市ヶ谷"},{"from":"中野","to":"横浜"},{"from":"吉祥寺","to":"池袋"},{"from":"大手町","to":"川崎"},{"from":"御茶ノ水","to":"銀座"},{"from":"横浜","to":"表参道"},{"from":"赤坂見附","to":"目黒"},{"from":"大崎","to":"下北沢"},{"from":"市ヶ谷","to":"大手町"},{"from":"代々木上原","to":"飯田橋"},{"from":"池袋","to":"表参道"},{"from":"銀座","to":"横浜"},{"from":"赤坂見附","to":"中野"},{"from":"飯田橋","to":"銀座"},{"from":"横浜","to":"吉祥寺"},{"from":"下北沢","to":"御茶ノ水"},{"from":"代々木上原","to":"市ヶ谷"},{"from":"吉祥寺","to":"赤坂見附"},{"from":"御茶ノ水","to":"大手町"},{"from":"池袋","to":"下北沢"},{"from":"市ヶ谷","to":"赤坂見附"},{"from":"御茶ノ水","to":"代々木上原"},{"from":"池袋","to":"御茶ノ水"},{"from":"赤坂見附","to":"下北沢"},{"from":"代々木上原","to":"赤坂見附"},{"from":"横浜","to":"赤坂見附"},{"from":"赤坂見附","to":"御茶ノ水"},{"from":"新宿","to":"日本橋"},{"from":"東京","to":"日本橋"},{"from":"表参道","to":"新宿"},{"from":"秋葉原","to":"大手町"}];
+function buildQuestionPool(minTransfers, maxTransfers=Infinity){
+  const pool = [];
+  for(const from of stations){
+    for(const to of stations){
+      if(from === to) continue;
+      const r = shortestTransferRoute(from, to);
+      if(!Number.isFinite(r.distance)) continue;
+      if(r.transfers >= minTransfers && r.transfers <= maxTransfers){
+        pool.push({from, to});
+      }
+    }
+  }
+  return pool;
+}
+
+const intermediatePool = buildQuestionPool(2, 2);
+const extremePool = buildQuestionPool(3, Infinity);
+
+const modeConfig = {
+  beginner: {label:"初級モード", short:"初級", pool:questionPool},
+  intermediate: {label:"中級モード", short:"中級", pool:intermediatePool},
+  extreme: {label:"激むずモード", short:"激むず", pool:extremePool}
+};
+
+let currentMode = "beginner";
+let lastDeviation = 50;
+let lastTitle = "";
+let gameQuestions = [];
 let q = 0;
 let total = 0;
 let currentFrom = "";
@@ -329,6 +417,52 @@ let questionStart = 0;
 let records = [];
 let currentCorrect = null;
 let currentOptions = [];
+
+function storageKey(mode){
+  return "norikaeRushBest_" + mode;
+}
+
+function getBest(mode){
+  try{
+    const raw = localStorage.getItem(storageKey(mode));
+    if(!raw) return null;
+    const data = JSON.parse(raw);
+    return data && Number.isFinite(data.deviation) ? data : null;
+  }catch(e){
+    return null;
+  }
+}
+
+function saveBest(mode, deviation, score, correctCount){
+  const old = getBest(mode);
+  const next = {deviation, score, correctCount, updatedAt:Date.now()};
+  const isBetter = !old ||
+    deviation > old.deviation ||
+    (deviation === old.deviation && score > old.score);
+  if(isBetter){
+    try{ localStorage.setItem(storageKey(mode), JSON.stringify(next)); }catch(e){}
+    return {best:next, isNew:true};
+  }
+  return {best:old, isNew:false};
+}
+
+function renderHomeBests(){
+  for(const mode of Object.keys(modeConfig)){
+    const el = document.getElementById("best-" + mode);
+    if(!el) continue;
+    const best = getBest(mode);
+    el.textContent = best ? `偏差値 ${best.deviation}` : "—";
+  }
+}
+
+function titleForDeviation(dev){
+  if(dev >= 70) return "乗り換え神";
+  if(dev >= 60) return "乗り換えプロ";
+  if(dev >= 50) return "東京移動マスター";
+  if(dev >= 40) return "通勤見習い";
+  if(dev >= 30) return "東京ビギナー";
+  return "東京迷子";
+}
 
 function show(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -342,8 +476,14 @@ function updateTimerRing(){
   ring.style.background = `conic-gradient(var(--yellow) 0deg ${deg}deg, #eef1f4 ${deg}deg 360deg)`;
 }
 
-function startGame(){
+function startGame(mode="beginner"){
+  currentMode = modeConfig[mode] ? mode : "beginner";
   q = 0; total = 0; records = [];
+  const sourcePool = modeConfig[currentMode].pool;
+  gameQuestions = [...sourcePool]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 5);
+  document.getElementById('modeBadge').textContent = modeConfig[currentMode].short;
   newQuestion();
 }
 
@@ -351,22 +491,9 @@ function newQuestion(){
   q++;
   document.getElementById('qnum').textContent = q;
 
-  let tries = 0;
-  let candidate;
-  do {
-    currentFrom = stations[Math.floor(Math.random()*stations.length)];
-    currentTo = stations[Math.floor(Math.random()*stations.length)];
-    candidate = shortestTransferRoute(currentFrom,currentTo);
-    tries++;
-  } while (
-    (
-      currentFrom === currentTo ||
-      !Number.isFinite(candidate.distance) ||
-      candidate.transfers !== 1 ||
-      bestDirectRoute(currentFrom, currentTo) !== null
-    ) &&
-    tries < 1000
-  );
+  const picked = gameQuestions[q - 1];
+  currentFrom = picked.from;
+  currentTo = picked.to;
 
   path = [currentFrom];
   timeLeft = 20;
@@ -396,76 +523,77 @@ function newQuestion(){
   }, 1000);
 }
 
+function formatTransferChoice(route){
+  const transfers = route.slice(1, -1);
+  if(transfers.length === 0) return "乗り換えなし";
+  if(transfers.length === 1) return transfers[0] + "で乗り換え";
+  return transfers.join(" → ");
+}
+
 function prepareQuestionOptions(){
   const best = shortestTransferRoute(currentFrom, currentTo);
-  // 正解は必ず1つだけ。
-  // 直通できるなら「乗り換えなし」。
-  // 直通できないなら、最短経路で最初に乗り換える駅。
-  const firstTransfer = best.route[1];
   currentCorrect = {
-    type: "transfer",
-    label: firstTransfer + "で乗り換え",
-    transfer: firstTransfer
+    label: formatTransferChoice(best.route),
+    route: best.route.slice(),
+    time: best.distance,
+    correct: true
   };
 
-  const distractors = [];
+  const alternatives = [];
+  const seen = new Set([currentCorrect.label]);
 
-  // 候補に使える駅を収集。
-  // 正解駅以外で、現在地から直通可能な駅を中心に選ぶ。
-  const reachable = directOptions(currentFrom)
-    .map(o => o.station)
-    .filter(s => s !== currentTo && (!currentCorrect.transfer || s !== currentCorrect.transfer));
+  // 出発駅から直通で行ける別の駅を最初の乗換候補にし、
+  // そこから目的地までの最短経路をつないで「実際に成立する遠回りルート」を作る。
+  for(const first of directOptions(currentFrom)){
+    if(first.station === currentTo) continue;
+    const rest = shortestTransferRoute(first.station, currentTo);
+    if(!Number.isFinite(rest.distance)) continue;
 
-  // 目的地までのルートが作れる駅だけ残す
-  const valid = reachable.filter(s => Number.isFinite(shortestTransferRoute(s, currentTo).distance));
+    const route = [currentFrom, first.station, ...rest.route.slice(1)];
+    const label = formatTransferChoice(route);
+    if(seen.has(label)) continue;
 
-  // 遠回り度合いを計算して、正解にならない駅を優先
-  const bestDistance = shortestTransferRoute(currentFrom, currentTo).distance;
-  const scored = valid.map(s => {
-    const leg = bestDirectRoute(currentFrom, s);
-    const rest = shortestTransferRoute(s, currentTo);
-    const total = (leg ? leg.time : Infinity) + rest.distance;
-    return {station:s, total};
-  }).filter(x => Number.isFinite(x.total));
+    // 選択肢として不自然すぎるループを除外
+    if(new Set(route).size !== route.length) continue;
 
-  scored.sort((a,b) => (b.total - bestDistance) - (a.total - bestDistance));
-
-  for(const item of scored){
-    if(distractors.length >= 3) break;
-    distractors.push({
-      type: "transfer",
-      label: item.station + "で乗り換え",
-      transfer: item.station
+    const time = first.time + rest.distance;
+    alternatives.push({
+      label,
+      route,
+      time,
+      correct: false,
+      transferCount: Math.max(0, route.length - 2),
+      gap: Math.max(0, time - best.distance)
     });
+    seen.add(label);
   }
 
-  // 直通問題では「乗り換えなし」が正解なので、他3つは乗換駅候補。
-  // 乗換問題では、足りなければ「乗り換えなし」を不正解候補に入れる。
-  if(currentCorrect.type === "transfer" && distractors.length < 3){
-    distractors.push({type:"direct", label:"乗り換えなし"});
-  }
+  // 正解と乗換回数が近く、所要時間も近い「迷いやすい」選択肢を優先
+  const targetTransfers = best.transfers;
+  alternatives.sort((a,b) => {
+    const aTransferGap = Math.abs(a.transferCount - targetTransfers);
+    const bTransferGap = Math.abs(b.transferCount - targetTransfers);
+    if(aTransferGap !== bTransferGap) return aTransferGap - bTransferGap;
+    return a.gap - b.gap;
+  });
 
-  // さらに足りない場合は全駅から補う
+  const distractors = alternatives.slice(0,3);
+
+  // 万一3つ足りない場合は、直通可能駅を単純候補として補う
   if(distractors.length < 3){
-    for(const s of stations){
-      if(s === currentFrom || s === currentTo) continue;
-      if(currentCorrect.transfer && s === currentCorrect.transfer) continue;
-      if(distractors.some(d => d.transfer === s)) continue;
-
-      const leg = bestDirectRoute(currentFrom, s);
-      if(!leg) continue;
-      distractors.push({
-        type:"transfer",
-        label:s + "で乗り換え",
-        transfer:s
-      });
+    for(const first of directOptions(currentFrom)){
       if(distractors.length >= 3) break;
+      if(first.station === currentTo) continue;
+      const route = [currentFrom, first.station, currentTo];
+      const label = formatTransferChoice(route);
+      if(seen.has(label)) continue;
+      distractors.push({label, route, time:Infinity, correct:false});
+      seen.add(label);
     }
   }
 
   currentOptions = [currentCorrect, ...distractors.slice(0,3)];
 
-  // シャッフル
   for(let i=currentOptions.length-1;i>0;i--){
     const j = Math.floor(Math.random()*(i+1));
     [currentOptions[i], currentOptions[j]] = [currentOptions[j], currentOptions[i]];
@@ -489,35 +617,12 @@ function renderChoices(){
 function answerChoice(index){
   clearInterval(timerId);
   const chosen = currentOptions[index];
-  const correct = (
-    chosen.type === currentCorrect.type &&
-    chosen.label === currentCorrect.label
-  );
+  const correct = !!chosen.correct;
 
-  let chosenRoute;
-  let chosenTime = Infinity;
+  path = chosen.route ? chosen.route.slice() : [currentFrom];
+  const chosenCalc = calcChosenRouteTime(path);
+  const chosenTime = Number.isFinite(chosen.time) ? chosen.time : chosenCalc.time;
 
-  if(chosen.type === "direct"){
-    const direct = bestDirectRoute(currentFrom, currentTo);
-    if(direct){
-      chosenRoute = [currentFrom, currentTo];
-      chosenTime = direct.time;
-    } else {
-      chosenRoute = [currentFrom];
-    }
-  } else {
-    const firstLeg = bestDirectRoute(currentFrom, chosen.transfer);
-    const rest = shortestTransferRoute(chosen.transfer, currentTo);
-
-    if(firstLeg && Number.isFinite(rest.distance)){
-      chosenRoute = [currentFrom, chosen.transfer, ...rest.route.slice(1)];
-      chosenTime = firstLeg.time + rest.distance;
-    } else {
-      chosenRoute = [currentFrom];
-    }
-  }
-
-  path = chosenRoute;
   finishQuestion(false, correct, chosen.label, chosenTime);
 }
 
@@ -572,10 +677,7 @@ function finishQuestion(timeout, isCorrect=false, answerLabel="", explicitYourTi
   const liveScoreEl = document.getElementById('liveScore');
   if(liveScoreEl) liveScoreEl.textContent = total.toLocaleString();
 
-  let correctAnswerLabel = "";
-  if(best.route.length > 1){
-    correctAnswerLabel = best.route[1] + "で乗り換え";
-  }
+  const correctAnswerLabel = formatTransferChoice(best.route);
 
   records.push({
     n:q,
@@ -609,6 +711,7 @@ function finishQuestion(timeout, isCorrect=false, answerLabel="", explicitYourTi
 
 function showFinal(){
   show('final');
+  document.getElementById('finalMode').textContent = modeConfig[currentMode].label;
   document.getElementById('totalScore').textContent = total.toLocaleString() + '点';
 
   const avg = total/5;
@@ -630,8 +733,20 @@ function showFinal(){
     else if(avgElapsed >= 17) dev -= 2;
     else if(avgElapsed >= 14) dev -= 1;
   }
-  dev = Math.max(15, Math.min(70, Math.round(dev)));
+  dev = Math.max(20, Math.min(70, Math.round(dev)));
+  lastDeviation = dev;
+  lastTitle = titleForDeviation(dev);
   document.getElementById('deviation').textContent = "東京偏差値 " + dev;
+  document.getElementById('titleBadge').textContent = lastTitle;
+
+  const saved = saveBest(currentMode, dev, total, correctCount);
+  const bestEl = document.getElementById('bestResult');
+  if(saved.best){
+    bestEl.textContent = saved.isNew
+      ? `🎉 NEW BEST！ 偏差値 ${saved.best.deviation}`
+      : `ベスト記録　偏差値 ${saved.best.deviation}`;
+  }
+  renderHomeBests();
 
   const details = document.getElementById('details');
   details.innerHTML = "";
@@ -679,6 +794,46 @@ function showFinal(){
     details.appendChild(card);
   });
 }
+
+function buildShareText(){
+  const correctCount = records.filter(r => r.correct).length;
+  return `乗り換えRUSH 🚃
+${modeConfig[currentMode].label}
+東京偏差値 ${lastDeviation}「${lastTitle}」
+5問中${correctCount}問正解！
+あなたの東京移動力は？`;
+}
+
+async function shareResult(){
+  const text = buildShareText();
+  const status = document.getElementById('shareStatus');
+  const url = location.href.split('?')[0].split('#')[0];
+
+  if(navigator.share){
+    try{
+      await navigator.share({
+        title:"乗り換えRUSH",
+        text,
+        url
+      });
+      if(status) status.textContent = "シェアしました";
+      return;
+    }catch(e){
+      if(e && e.name === "AbortError") return;
+    }
+  }
+
+  const fallback = text + "\n" + url;
+  try{
+    await navigator.clipboard.writeText(fallback);
+    if(status) status.textContent = "結果をコピーしました。SNSに貼り付けてシェアできます。";
+  }catch(e){
+    if(status) status.textContent = "このブラウザでは自動コピーできませんでした。";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", renderHomeBests);
+
 </script>
 </body>
 </html>
