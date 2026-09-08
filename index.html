@@ -519,19 +519,52 @@ async function supabaseRequest(path, options={}){
 
 async function submitWorldScore(mode, scoreValue, totalScoreValue=0){
   if(!rankingEnabled()) return null;
-  const payload={
-    player_id:getPlayerId(),
-    mode,
-    score_value:Number(scoreValue)||0,
-    total_score:Number(totalScoreValue)||0,
-    user_agent:navigator.userAgent.slice(0,180)
-  };
-  await supabaseRequest(RANKING_TABLE,{
-    method:"POST",
-    headers:{"Prefer":"return=minimal"},
-    body:JSON.stringify(payload)
-  });
-  return getWorldRank(mode, payload.score_value);
+
+  const playerId=getPlayerId();
+  const nextScore=Number(scoreValue)||0;
+  const nextTotal=Number(totalScoreValue)||0;
+
+  // 同じユーザー×同じモードは最高記録1件だけ保持
+  const ownRes=await supabaseRequest(
+    `${RANKING_TABLE}?player_id=eq.${encodeURIComponent(playerId)}&mode=eq.${encodeURIComponent(mode)}&select=id,score_value,total_score&limit=1`
+  );
+  const ownRows=await ownRes.json();
+  const current=Array.isArray(ownRows) && ownRows.length ? ownRows[0] : null;
+
+  const isBetter=!current ||
+    nextScore > Number(current.score_value||0) ||
+    (nextScore === Number(current.score_value||0) && nextTotal > Number(current.total_score||0));
+
+  if(!current){
+    const payload={
+      player_id:playerId,
+      mode,
+      score_value:nextScore,
+      total_score:nextTotal,
+      user_agent:navigator.userAgent.slice(0,180)
+    };
+    await supabaseRequest(RANKING_TABLE,{
+      method:"POST",
+      headers:{"Prefer":"return=minimal"},
+      body:JSON.stringify(payload)
+    });
+  }else if(isBetter){
+    await supabaseRequest(
+      `${RANKING_TABLE}?id=eq.${encodeURIComponent(current.id)}`,
+      {
+        method:"PATCH",
+        headers:{"Prefer":"return=minimal"},
+        body:JSON.stringify({
+          score_value:nextScore,
+          total_score:nextTotal,
+          user_agent:navigator.userAgent.slice(0,180)
+        })
+      }
+    );
+  }
+
+  const effectiveScore=current && !isBetter ? Number(current.score_value||0) : nextScore;
+  return getWorldRank(mode, effectiveScore);
 }
 
 async function getWorldRank(mode, scoreValue){
@@ -581,7 +614,7 @@ async function refreshWorldRanks(){
       el.textContent="取得失敗";
     }
   }
-  if(status) status.textContent="世界中の匿名プレイデータから算出";
+  if(status) status.textContent="世界中の匿名ユーザーの最高記録から算出";
 }
 
 async function recordNormalWorldResult(mode,deviation,totalScoreValue){
