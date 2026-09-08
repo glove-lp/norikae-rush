@@ -58,7 +58,7 @@
     .mode-btn span{display:block;color:#667085;font-size:12px;line-height:1.55}
     .best-box{margin:18px auto 0;max-width:720px;background:#f8fafc;border:1px solid var(--line);border-radius:13px;padding:14px 16px;text-align:left}
     .best-title{font-size:13px;font-weight:900;color:#344054;margin-bottom:8px}
-    .best-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .best-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
     .best-item{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 6px;text-align:center;min-width:0}
     .best-item .bmode{font-size:clamp(9px,2.5vw,11px);color:#667085;font-weight:800;white-space:nowrap}
     .best-item .bscore{font-size:clamp(13px,3.5vw,18px);font-weight:950;margin-top:3px;white-space:nowrap}
@@ -509,7 +509,6 @@ async function supabaseRequest(path, options={}){
   if(!rankingEnabled()) throw new Error("ranking_not_configured");
   const headers={
     "apikey":SUPABASE_ANON_KEY,
-    "Authorization":"Bearer "+SUPABASE_ANON_KEY,
     "Content-Type":"application/json",
     ...(options.headers||{})
   };
@@ -1284,21 +1283,6 @@ function showFinal(){
       <div class="detail-row">
         <div class="subtle">あなたの回答</div>
         <div><strong>${r.answer}</strong></div>
-      </div>
-
-      <div class="detail-row">
-        <div class="subtle">基準ルート</div>
-        <div>${r.bestRoute.join(" → ")}</div>
-      </div>
-
-      <div class="detail-row">
-        <div class="subtle">使う路線</div>
-        <div><strong>${formatLineGuide(r.bestSegments)}</strong></div>
-      </div>
-
-      <div class="detail-row">
-        <div class="subtle">所要時間目安</div>
-        <div><strong>約${r.bestTime}分</strong></div>
       </div>
 
 
