@@ -215,59 +215,82 @@
 .answer-result-route{font-size:17px;font-weight:950;margin:8px auto 6px;overflow-wrap:anywhere}.answer-result-sub{font-size:13px;color:#65778d;font-weight:850;margin-top:4px}.answer-next-row{display:flex;justify-content:center;margin-top:13px}.answer-next-btn{border:0;border-radius:16px;padding:13px 24px;font:inherit;font-weight:950;cursor:pointer;background:#ffd84c;box-shadow:0 5px 0 #eabf24}.answer-next-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #eabf24}.answer-next-btn:disabled{opacity:.45;cursor:default;transform:none}
 @media(max-width:640px){.answer-journey-wrap{padding:8px 7px 20px}.answer-journey-title{font-size:18px}.answer-stage{height:370px}.answer-stations{left:2.5%;right:2.5%}.answer-lines{left:2.5%;right:2.5%;bottom:36px;height:48px}.answer-track{left:2.5%;right:2.5%;bottom:124px}.answer-train{bottom:136px;width:120px}.answer-station{width:72px}.answer-station-name{font-size:9px;padding:6px 6px;max-width:92px;min-width:54px}.answer-marker{width:22px;height:22px;border-width:6px}.answer-result-big{font-size:33px}.answer-result-route{font-size:14px}.answer-journey-meta{margin:0 2px 10px}.answer-journey-chip{font-size:11px;padding:8px 10px}}
 
+
+
+/* ===== v24 GAME-LIKE HOME / RESULT UI ===== */
+.home-game-shell,.final-game-shell{position:relative;overflow:hidden;border-radius:28px;padding:24px 18px 30px;background:linear-gradient(180deg,#eaf5ff 0,#f9fcff 48%,#fff 100%);border:1px solid #d8e7f5;box-shadow:0 18px 50px rgba(8,40,79,.12)}
+.home-game-shell:before,.final-game-shell:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,40,79,.025) 1px,transparent 1px),linear-gradient(rgba(8,40,79,.025) 1px,transparent 1px);background-size:28px 28px;pointer-events:none}
+.home-kicker{position:relative;text-align:center;font-size:11px;font-weight:1000;letter-spacing:.22em;color:#50739b;margin-top:2px}.home-logo,.final-logo{position:relative;text-align:center;color:#08284f;font-weight:1000;font-size:clamp(38px,7vw,66px);letter-spacing:-.07em;line-height:1}.home-logo span,.final-logo span{margin-left:10px;color:#ef3340;font-style:italic;text-shadow:3px 3px 0 #ffd84c}.home-copy{position:relative;text-align:center;margin:12px 0 0;font-weight:950;color:#274d75;font-size:clamp(16px,3vw,22px);letter-spacing:.04em}
+.home-sky-deco{position:absolute;color:#fff;text-shadow:0 2px 8px rgba(63,119,170,.12);opacity:.9;pointer-events:none}.home-cloud{font-size:52px}.home-cloud.c1{top:80px;left:5%}.home-cloud.c2{top:130px;right:7%;transform:scale(.75)}
+.home-train-stage{position:relative;height:230px;margin:0 auto 10px;max-width:900px;overflow:hidden}.home-city{position:absolute;left:0;right:0;bottom:62px;text-align:center;font-size:45px;letter-spacing:20px;opacity:.24;filter:grayscale(.25)}.home-train-art{position:absolute;width:min(360px,58vw);left:50%;bottom:48px;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 16px 13px rgba(8,40,79,.18));animation:homeTrainFloat 2.4s ease-in-out infinite}.home-rail,.final-rail{position:absolute;left:3%;right:3%;height:12px;bottom:42px;border-top:5px solid #243b53;border-bottom:5px solid #243b53;z-index:2}.home-rail:before,.final-rail:before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;background:repeating-linear-gradient(90deg,#8b6b45 0 20px,transparent 20px 42px);transform:translateY(-50%)}.home-platform-sign{position:absolute;z-index:4;left:5%;bottom:10px;background:#08284f;color:#fff;border:3px solid #fff;box-shadow:0 5px 0 #d6e5f2;border-radius:10px;padding:7px 12px;transform:rotate(-1deg)}.home-platform-sign span{display:block;color:#ffd84c;font-size:8px;font-weight:1000;letter-spacing:.15em}.home-platform-sign strong{font-size:12px}@keyframes homeTrainFloat{50%{transform:translateX(-50%) translateY(-5px)}}
+.game-menu-card{position:relative;border-radius:22px!important;margin-top:-4px;background:rgba(255,255,255,.94)!important;border:2px solid #fff!important;box-shadow:0 16px 34px rgba(8,40,79,.1)!important}.game-menu-title{text-align:center;font-size:20px;font-weight:1000;color:#08284f;margin-bottom:16px;letter-spacing:.04em}.game-menu-title span{font-size:24px}.game-menu-title small{display:block;font-size:10px;color:#8295a8;letter-spacing:.08em;margin-top:4px}.game-mode-card{position:relative;overflow:hidden;border-width:2px!important;border-radius:20px!important;padding:22px!important;box-shadow:0 9px 0 rgba(8,40,79,.08)!important}.game-mode-card .mode-icon{font-size:40px;line-height:1;margin-bottom:6px}.game-mode-card h3{font-size:24px!important;color:#08284f}.mode-ribbon{position:absolute;right:14px;top:14px;border-radius:999px;background:#e7f0ff;color:#245cab;padding:5px 8px;font-size:9px;font-weight:1000;letter-spacing:.08em}.rush-ribbon{background:#fff0da;color:#b54708}.rush-glow{background:linear-gradient(145deg,#fffdf4,#fff7df)!important;border-color:#ffd56a!important}.compact-mode-grid{gap:7px!important}.compact-mode-grid .mode-btn{padding:12px 8px!important;text-align:center!important;border-radius:13px!important;box-shadow:0 4px 0 #dfe7ef!important}.compact-mode-grid .mode-btn b{display:block;color:#f5b800;font-size:10px;letter-spacing:-2px}.compact-mode-grid .mode-btn strong{font-size:16px!important;margin:2px 0!important}.compact-mode-grid .mode-btn span{font-size:9px!important}.compact-mode-grid .mode-btn:hover{transform:translateY(-2px)!important}.rush-start{width:100%;border-radius:14px!important;background:linear-gradient(180deg,#ef3340,#d91f2e)!important;border:0!important;box-shadow:0 6px 0 #a90d19!important;font-size:18px;padding:15px!important}.rush-start span{float:right}.rush-start:active{transform:translateY(4px);box-shadow:0 2px 0 #a90d19!important}
+.home-dashboard{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}.game-record-box,.game-world-box{margin:0!important;max-width:none!important;border-radius:16px!important;background:#f8fbff!important;border:1px solid #dceaf7!important}.best-title,.world-title{letter-spacing:.06em}.best-item,.world-item{box-shadow:0 3px 0 #e7edf3;border-radius:11px!important}.rush-best{background:#fff9e9!important}
+.final-game-shell{padding-top:18px;background:linear-gradient(180deg,#fff4cf 0,#eff8ff 34%,#fff 100%)}.final-topline{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:2}.final-logo{font-size:28px;text-align:left}.final-logo span{text-shadow:2px 2px 0 #ffd84c}.final-clear-chip{font-size:11px;font-weight:1000;letter-spacing:.1em;background:#08284f;color:#fff;padding:8px 12px;border-radius:999px}.final-arrival-stage{position:relative;height:210px;margin-top:6px;overflow:hidden}.final-train-art{position:absolute;width:min(330px,57vw);left:50%;bottom:45px;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 14px 12px rgba(8,40,79,.18));animation:finalTrainArrive .7s cubic-bezier(.2,.8,.2,1) both}.final-rail{bottom:39px}.final-station-board{position:absolute;right:5%;top:22px;z-index:4;background:#fff;border:4px solid #08284f;border-radius:8px;padding:8px 15px;box-shadow:6px 7px 0 #ffd84c;text-align:center}.final-station-board small{display:block;font-size:8px;color:#667085;font-weight:1000;letter-spacing:.18em}.final-station-board strong{display:block;color:#08284f;font-size:15px}@keyframes finalTrainArrive{from{transform:translateX(-160%) scale(.9);opacity:.3}to{transform:translateX(-50%) scale(1);opacity:1}}
+.final-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}.final-confetti i{position:absolute;font-style:normal;font-size:14px;animation:confettiFall 3.8s linear infinite}.final-confetti i:nth-child(1){left:8%;animation-delay:-.2s;color:#ef3340}.final-confetti i:nth-child(2){left:20%;animation-delay:-1.8s;color:#2f72e9}.final-confetti i:nth-child(3){left:35%;animation-delay:-.8s;color:#f5b800}.final-confetti i:nth-child(4){left:48%;animation-delay:-2.5s;color:#0aa276}.final-confetti i:nth-child(5){left:63%;animation-delay:-1.2s;color:#ef3340}.final-confetti i:nth-child(6){left:75%;animation-delay:-3s;color:#2f72e9}.final-confetti i:nth-child(7){left:87%;animation-delay:-.5s;color:#f5b800}.final-confetti i:nth-child(8){left:94%;animation-delay:-2.1s;color:#0aa276}@keyframes confettiFall{from{top:-6%;transform:rotate(0)}to{top:42%;transform:rotate(540deg)}}
+.result-game-card{position:relative;margin-top:-10px;border-radius:22px!important;border:2px solid #fff!important;box-shadow:0 18px 34px rgba(8,40,79,.12)!important}.result-eyebrow{font-size:10px;font-weight:1000;letter-spacing:.18em;color:#7b91a7;margin:6px 0}.result-game-card .bigscore{color:#08284f;text-shadow:0 4px 0 #e9f2fb}.result-rank-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px auto 10px}.rank-medal{font-size:36px}.result-rank-row small{font-weight:900;color:#8a9bad;letter-spacing:.15em}.result-rank-row .grade{font-size:30px;color:#ef3340;line-height:1}.score-ticket{display:inline-flex;align-items:center;gap:13px;margin-top:12px;padding:10px 16px;border:2px dashed #9fb8d1;border-radius:12px;background:#f7fbff}.score-ticket span{font-size:11px;font-weight:900;color:#60778f}.score-ticket strong{font-size:26px;color:#08284f}.game-action-row button{border-radius:13px!important;font-weight:950}.share-main{background:linear-gradient(180deg,#08284f,#051c38)!important;box-shadow:0 5px 0 #03101e}.replay-main{background:#fff8e8!important;border-color:#f0b84b!important}.home-main{background:#f7f9fc!important}
+@media(max-width:760px){.home-game-shell,.final-game-shell{border-radius:18px;padding:18px 10px 22px}.home-train-stage{height:190px}.home-city{font-size:32px;letter-spacing:10px}.home-train-art{width:min(300px,72vw)}.home-dashboard{grid-template-columns:1fr}.home-cloud{font-size:38px}.game-menu-card{padding:16px!important}.playtype-grid{grid-template-columns:1fr}.compact-mode-grid{grid-template-columns:repeat(3,1fr)!important}.game-mode-card{padding:17px!important}.final-arrival-stage{height:175px}.final-train-art{width:min(280px,70vw)}.final-station-board{top:8px;right:3%;padding:6px 10px}.final-station-board strong{font-size:12px}.result-game-card{padding:18px 13px!important}.score-ticket strong{font-size:22px}}
+
 </style>
 </head>
 <body>
 <div id="correctNow" class="correct-now">正解！</div>
 <div class="wrap">
     <section id="home" class="screen active">
-      <div class="brand">乗り換え<span class="rush">RUSH</span></div>
-      <div class="home-card hero">
-        <h1>東京の移動力、試してみる？</h1>
-        <p>ベストな乗換ルートを4択から選ぶ、東京移動力ゲーム。</p>
-        <div class="playtype-title">プレイモードを選ぶ</div>
-        <div class="playtype-grid">
-          <div class="playtype-card normal-card">
-            <h3>通常モード</h3>
-            <p>1問20秒・全5問。5問の結果から東京偏差値を判定します。</p>
-            <div class="mode-grid">
-              <button class="mode-btn" onclick="startGame('beginner')"><strong>初級</strong></button>
-              <button class="mode-btn" onclick="startGame('intermediate')"><strong>中級</strong></button>
-              <button class="mode-btn" onclick="startGame('extreme')"><strong>上級</strong></button>
+      <div class="home-game-shell">
+        <div class="home-sky-deco home-cloud c1">☁</div><div class="home-sky-deco home-cloud c2">☁</div>
+        <div class="home-kicker">TOKYO TRANSFER GAME</div>
+        <div class="home-logo">乗り換え<span>RUSH</span></div>
+        <div class="home-copy">東京を、最速で駆け抜けろ。</div>
+        <div class="home-train-stage">
+          <div class="home-city">🏢　🏙️　🗼　🏢　🏙️</div>
+          <img id="homeTrainArt" class="home-train-art" alt="乗り換えRUSHの赤い電車">
+          <div class="home-rail"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="home-platform-sign"><span>START</span><strong>東京移動力を測定</strong></div>
+        </div>
+
+        <div class="home-card game-menu-card">
+          <div class="game-menu-title"><span>🎮</span> MODE SELECT <small>プレイモードを選択</small></div>
+          <div class="playtype-grid">
+            <div class="playtype-card normal-card game-mode-card">
+              <div class="mode-icon">🚉</div><div class="mode-ribbon">5 QUESTIONS</div>
+              <h3>通常モード</h3>
+              <p>1問20秒・全5問。結果からあなたの「東京偏差値」を判定。</p>
+              <div class="mode-grid compact-mode-grid">
+                <button class="mode-btn beginner" onclick="startGame('beginner')"><b>★</b><strong>初級</strong><span>乗換1回</span></button>
+                <button class="mode-btn intermediate" onclick="startGame('intermediate')"><b>★★</b><strong>中級</strong><span>乗換2回</span></button>
+                <button class="mode-btn extreme" onclick="startGame('extreme')"><b>★★★</b><strong>上級</strong><span>乗換3回〜</span></button>
+              </div>
+            </div>
+            <div class="playtype-card rush-card game-mode-card rush-glow">
+              <div class="mode-icon">🔥</div><div class="mode-ribbon rush-ribbon">ENDLESS</div>
+              <h3>ラッシュモード</h3>
+              <p>間違えるまで連続挑戦。100問連続正解で「乗り換えRUSH MASTER」認定。</p>
+              <button class="primary rush-start" onclick="startRush()">🚃 RUSH START <span>→</span></button>
             </div>
           </div>
 
-          <div class="playtype-card rush-card">
-            <h3>🔥 ラッシュモード</h3>
-            <p>100問マスターからランダム出題。1問20秒で、間違えるか時間切れになるまで連続挑戦。100問連続正解で「乗り換えRUSH MASTER」認定。</p>
-            <button class="primary" onclick="startRush()">ラッシュに挑戦</button>
+          <div class="home-dashboard">
+            <div class="best-box game-record-box">
+              <div class="best-title">🏆 BEST RECORD</div>
+              <div class="best-grid">
+                <div class="best-item"><div class="bmode">初級</div><div id="best-beginner" class="bscore">—</div></div>
+                <div class="best-item"><div class="bmode">中級</div><div id="best-intermediate" class="bscore">—</div></div>
+                <div class="best-item"><div class="bmode">上級</div><div id="best-extreme" class="bscore">—</div></div>
+                <div class="best-item rush-best"><div class="bmode">RUSH</div><div id="best-rush" class="bscore">0問</div></div>
+              </div>
+            </div>
+            <div class="world-box game-world-box">
+              <div class="world-head"><div class="world-title">🌍 WORLD RANKING</div><div class="world-note">匿名</div></div>
+              <div class="world-grid">
+                <div class="world-item"><div class="wmode">初級</div><div id="world-beginner" class="wrank">—</div></div>
+                <div class="world-item"><div class="wmode">中級</div><div id="world-intermediate" class="wrank">—</div></div>
+                <div class="world-item"><div class="wmode">上級</div><div id="world-extreme" class="wrank">—</div></div>
+                <div class="world-item"><div class="wmode">RUSH</div><div id="world-rush" class="wrank">—</div></div>
+              </div>
+              <div id="worldStatus" class="world-status">ランキング接続前</div>
+            </div>
           </div>
         </div>
-
-        <div class="best-box">
-          <div class="best-title">ベスト記録</div>
-          <div class="best-grid">
-            <div class="best-item"><div class="bmode">初級</div><div id="best-beginner" class="bscore">—</div></div>
-            <div class="best-item"><div class="bmode">中級</div><div id="best-intermediate" class="bscore">—</div></div>
-            <div class="best-item"><div class="bmode">上級</div><div id="best-extreme" class="bscore">—</div></div>
-            <div class="best-item"><div class="bmode">RUSH</div><div id="best-rush" class="bscore">0問</div></div>
-          </div>
-        </div>
-
-        <div class="world-box">
-          <div class="world-head">
-            <div class="world-title">🌍 世界ランキング</div>
-            <div class="world-note">匿名データ</div>
-          </div>
-          <div class="world-grid">
-            <div class="world-item"><div class="wmode">初級</div><div id="world-beginner" class="wrank">—</div></div>
-            <div class="world-item"><div class="wmode">中級</div><div id="world-intermediate" class="wrank">—</div></div>
-            <div class="world-item"><div class="wmode">上級</div><div id="world-extreme" class="wrank">—</div></div>
-            <div class="world-item"><div class="wmode">RUSH</div><div id="world-rush" class="wrank">—</div></div>
-          </div>
-          <div id="worldStatus" class="world-status">ランキング接続前</div>
-        </div>
-
       </div>
     </section>
 
@@ -327,34 +350,44 @@
     </section>
 
     <section id="final" class="screen">
-      <div class="brand">乗り換え<span class="rush">RUSH</span></div>
-      <div class="result-card">
-        <div id="normalResultArea">
-          <div id="finalMode" class="mode-chip">初級モード</div>
-          <div class="subtle">TOKYO SCORE</div><div id="deviation" class="bigscore">東京偏差値 50</div>
-          <div id="titleBadge" class="title-badge">東京移動マスター</div><div id="percentile" class="percentile"></div>
-          <div id="finalGrade" class="grade"></div>
-          <div id="bestResult" class="best-result">ベスト記録 —</div>
-          <div id="normalWorldRank" class="result-world-rank" style="display:none">🌍 世界順位を集計中...</div>
-          <div class="subtle" style="margin-top:12px">総合スコア</div><div id="totalScore" style="font-size:36px;font-weight:950;margin-top:4px">0点</div>
+      <div class="final-game-shell">
+        <div class="final-confetti" aria-hidden="true"><i>◆</i><i>●</i><i>▲</i><i>★</i><i>◆</i><i>●</i><i>★</i><i>▲</i></div>
+        <div class="final-topline"><div class="final-logo">乗り換え<span>RUSH</span></div><div class="final-clear-chip">🏁 RESULT</div></div>
+        <div class="final-arrival-stage">
+          <div class="final-station-board"><small>ARRIVAL</small><strong id="finalStationMessage">チャレンジ完了！</strong></div>
+          <img id="finalTrainArt" class="final-train-art" alt="ゴールした赤い電車">
+          <div class="final-rail"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
         </div>
-        <div id="rushResultArea" style="display:none">
-          <div class="mode-chip">ラッシュモード</div>
-          <div class="subtle">連続正解記録</div>
-          <div class="rush-result-main"><span id="rushCorrectCount">0</span><span class="rush-result-unit">問</span></div>
-          <div id="rushResultMessage" class="title-badge">挑戦終了！</div>
-          <div id="rushBestResult" class="best-result">最高記録 —</div>
-          <div id="rushWorldRank" class="result-world-rank" style="display:none">🌍 世界順位を集計中...</div>
-          <div id="masterCert" class="master-cert" style="display:none">🏆 乗り換えRUSH MASTER 認定</div>
-          <div id="rushSub" class="rush-sub"></div>
+        <div class="result-card result-game-card">
+          <div id="normalResultArea">
+            <div id="finalMode" class="mode-chip">初級モード</div>
+            <div class="result-eyebrow">YOUR TOKYO POWER</div>
+            <div id="deviation" class="bigscore">東京偏差値 50</div>
+            <div id="titleBadge" class="title-badge">東京移動マスター</div>
+            <div id="percentile" class="percentile"></div>
+            <div class="result-rank-row"><div class="rank-medal">🏆</div><div><small>RANK</small><div id="finalGrade" class="grade"></div></div></div>
+            <div id="bestResult" class="best-result">ベスト記録 —</div>
+            <div id="normalWorldRank" class="result-world-rank" style="display:none">🌍 世界順位を集計中...</div>
+            <div class="score-ticket"><span>総合スコア</span><strong id="totalScore">0点</strong></div>
+          </div>
+          <div id="rushResultArea" style="display:none">
+            <div class="mode-chip">🔥 ラッシュモード</div>
+            <div class="result-eyebrow">RUSH RECORD</div>
+            <div class="rush-result-main"><span id="rushCorrectCount">0</span><span class="rush-result-unit">問</span></div>
+            <div id="rushResultMessage" class="title-badge">挑戦終了！</div>
+            <div id="rushBestResult" class="best-result">最高記録 —</div>
+            <div id="rushWorldRank" class="result-world-rank" style="display:none">🌍 世界順位を集計中...</div>
+            <div id="masterCert" class="master-cert" style="display:none">🏆 乗り換えRUSH MASTER 認定</div>
+            <div id="rushSub" class="rush-sub"></div>
+          </div>
+          <canvas id="shareCanvas" width="1080" height="1350" style="display:none"></canvas><div id="details"></div>
+          <div class="share-row game-action-row">
+            <button class="primary share-main" onclick="shareResult()">📣 結果をシェア</button>
+            <button class="ghost replay-main" onclick="restartCurrentGame()">↻ もう一度遊ぶ</button>
+            <button class="ghost home-main" onclick="goHome()">⌂ トップに戻る</button>
+          </div>
+          <div id="shareStatus" class="share-status"></div>
         </div>
-        <canvas id="shareCanvas" width="1080" height="1350" style="display:none"></canvas><div id="details"></div>
-        <div class="share-row">
-          <button class="primary" onclick="shareResult()">結果をシェア</button>
-          <button class="ghost" onclick="restartCurrentGame()">もう一度遊ぶ</button>
-          <button class="ghost" onclick="goHome()">トップに戻る</button>
-        </div>
-        <div id="shareStatus" class="share-status"></div>
       </div>
     </section>
   </div>
@@ -1231,7 +1264,8 @@ function showAnswerJourney(timeout, isCorrect, answerLabel, explicitYourTime){
       if(timeout) sub.textContent=`時間切れ。正解：${transfers.length===1?transfers[0]+'で乗り換え':transfers.join(' → ')} ／ ${lines.join(' → ')}`;
       else if(!isCorrect) sub.textContent=`正解：${transfers.length===1?transfers[0]+'で乗り換え':transfers.join(' → ')} ／ ${lines.join(' → ')}`;
       next.textContent=(gameType==='rush' && !isCorrect)||timeout ? '結果を見る →' : (gameType==='normal' && q>=5 ? '結果を見る →' : '次の問題へ →');
-      // 正解・不正解SEは、電車がルートを走り切って結果表示が出るこのタイミングで再生
+      // 結果表示・正解演出・SEは、電車が最後まで走り切ってから初めて出す
+      if(isCorrect && !timeout) showCorrectNow();
       if(timeout || !isCorrect) playWrongSound();
       else playCorrectSound();
       next.disabled=false;
@@ -1253,7 +1287,6 @@ function answerChoice(index){
   const correct = !!chosen.correct;
 
   if(correct){
-    showCorrectNow();
     combo++;
     maxComboThisGame=Math.max(maxComboThisGame,combo);
     if(combo===1) pendingPraise="1 COMBO　いいね！";
@@ -1388,6 +1421,7 @@ function finishQuestion(timeout, isCorrect=false, answerLabel="", explicitYourTi
 }
 
 function showRushFinal(){
+  updateFinalStationMessage('RUSH 終点！');
   clearInterval(timerId);
   if(typeof stopBgm==="function") stopBgm();
   if(typeof playResultSE==="function") playResultSE();
@@ -1453,6 +1487,7 @@ function showRushFinal(){
 }
 
 function showFinal(){
+  updateFinalStationMessage('5問チャレンジ完了！');
   if(typeof stopBgm==="function") stopBgm();
   if(typeof playResultSE==="function") playResultSE();
   show('final');
@@ -1591,7 +1626,15 @@ async function shareResult(){
   if(status)status.textContent="結果をコピーし、Xの投稿画面を開きました。InstagramやLINEにはコピーした内容を貼り付けられます。";
 }
 
-document.addEventListener("DOMContentLoaded", ()=>{renderHomeBests();renderProfile();});
+
+function syncGameTrainArt(){
+  const src=document.querySelector('#answerJourneyTrain img')?.src;
+  if(!src)return;
+  const h=document.getElementById('homeTrainArt'), f=document.getElementById('finalTrainArt');
+  if(h&&!h.src)h.src=src; if(f&&!f.src)f.src=src;
+}
+function updateFinalStationMessage(text){const el=document.getElementById('finalStationMessage');if(el)el.textContent=text||'チャレンジ完了！';}
+document.addEventListener("DOMContentLoaded", ()=>{syncGameTrainArt();renderHomeBests();renderProfile();});
 
 </script>
 
