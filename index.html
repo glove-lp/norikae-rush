@@ -1143,14 +1143,23 @@ function prepareQuestionOptions(){
     for(const item of shuffled){
       if(distractors.length >= 3) break;
       if(!Array.isArray(item.masterTransfers) || !item.masterTransfers.length) continue;
-      const label = item.masterTransfers.length === 1
-        ? item.masterTransfers[0] + "で乗り換え"
-        : item.masterTransfers.join(" → ");
+
+      // 出発駅・到着駅そのものを「乗換駅」として表示する誤答は除外する。
+      // 例：長津田 → 立川 で「立川で乗り換え」「長津田で乗り換え」は出さない。
+      const transferStations = item.masterTransfers.map(String);
+      if(transferStations.includes(currentFrom) || transferStations.includes(currentTo)) continue;
+
+      // 同じ駅を複数回通る不自然な乗換候補も除外する。
+      if(new Set(transferStations).size !== transferStations.length) continue;
+
+      const label = transferStations.length === 1
+        ? transferStations[0] + "で乗り換え"
+        : transferStations.join(" → ");
       if(seen.has(label)) continue;
       seen.add(label);
       distractors.push({
         label,
-        route:[currentFrom,...item.masterTransfers,currentTo],
+        route:[currentFrom,...transferStations,currentTo],
         time:Infinity,
         correct:false
       });
@@ -1181,6 +1190,15 @@ function prepareQuestionOptions(){
     alternatives.sort((a,b)=>Math.abs(a.transferCount-best.transfers)-Math.abs(b.transferCount-best.transfers)||a.gap-b.gap);
     currentOptions=[currentCorrect,...alternatives.slice(0,3)];
   }
+
+  // 最終防御：誤答の中間駅に出発駅・到着駅が混ざっていたら表示しない。
+  currentOptions = currentOptions.filter(opt => {
+    if(opt.correct) return true;
+    const transfers = Array.isArray(opt.route) ? opt.route.slice(1, -1) : [];
+    return !transfers.includes(currentFrom) &&
+           !transfers.includes(currentTo) &&
+           new Set(transfers).size === transfers.length;
+  });
 
   for(let i=currentOptions.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
