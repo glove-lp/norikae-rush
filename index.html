@@ -1658,10 +1658,19 @@ document.addEventListener("DOMContentLoaded", ()=>{syncGameTrainArt();renderHome
 
 
 
+<!-- v25 DOVA-SYNDROME BGM integration
+  Required companion files in the same directory:
+  - train_matsu.ogg : "Train" by MATSU (DOVA-SYNDROME)
+  - after_fanfare_aishu.ogg : "アフター・ファンファーレ" by 藍舟 (DOVA-SYNDROME)
+  Use converted game-asset copies under the applicable DOVA-SYNDROME license.
+-->
+<audio id="dovaHomeBgm" preload="auto" loop src="train_matsu.ogg"></audio>
+<audio id="dovaResultBgm" preload="auto" loop src="after_fanfare_aishu.ogg"></audio>
+
 <script>
-/* v20 sound prototype: all sounds are synthesized with Web Audio, so the HTML remains self-contained. */
+/* v25 sound system: DOVA-SYNDROME tracks for home/result + synthesized quiz/SE. */
 const soundPrefs = JSON.parse(localStorage.getItem("norikaeRushSoundPrefs") || '{"home":1,"next":2,"quiz":1,"result":2,"resultBgm":1,"enabled":true}');
-soundPrefs.next=2; soundPrefs.result=2; if(!soundPrefs.resultBgm) soundPrefs.resultBgm=1;
+soundPrefs.next=2; soundPrefs.result=2; soundPrefs.home=1; soundPrefs.resultBgm=1;
 let uxCtx=null, bgmTimer=null, bgmMode=null, bgmStep=0;
 function uxAudio(){
   const C=window.AudioContext||window.webkitAudioContext;
@@ -1709,18 +1718,45 @@ const RESULT_PATTERNS=[
  [523,587,659,784,880,784,659,1047],      // ranking
  [440,523,659,784,698,659,523,659]        // afterglow
 ];
+function getDovaAudio(mode){
+  if(mode==="home") return document.getElementById("dovaHomeBgm");
+  if(mode==="resultBgm") return document.getElementById("dovaResultBgm");
+  return null;
+}
+function stopDovaAudio(){
+  ["dovaHomeBgm","dovaResultBgm"].forEach(id=>{
+    const a=document.getElementById(id);
+    if(a){a.pause();a.currentTime=0;}
+  });
+}
 function startBgm(mode){
   if(!soundPrefs.enabled)return stopBgm();
-  const v=soundPrefs[mode]||1;
-  const patterns=mode==="home"?HOME_PATTERNS:(mode==="quiz"?QUIZ_PATTERNS:RESULT_PATTERNS);
-  const p=patterns[v-1]||patterns[0];
-  if(bgmMode===mode&&bgmTimer)return;
+  if(bgmMode===mode){
+    const a=getDovaAudio(mode);
+    if((a && !a.paused) || bgmTimer) return;
+  }
   stopBgm();bgmMode=mode;bgmStep=0;
-  const isHome=mode==="home", isResult=mode==="resultBgm";
-  const tick=()=>{uxTone(p[bgmStep%p.length],isResult?.24:(isHome?.18:.11),isResult?.020:(isHome?.018:.014),isResult?"sine":(isHome?"sine":"triangle"));bgmStep++;};
-  tick();bgmTimer=setInterval(tick,isResult?390:(isHome?330:245));
+
+  // v25: official selected BGM
+  const dova=getDovaAudio(mode);
+  if(dova){
+    dova.volume = mode==="home" ? 0.28 : 0.34;
+    dova.currentTime=0;
+    dova.play().catch(()=>{});
+    return;
+  }
+
+  // Quiz BGM remains synthesized (no external asset required).
+  const v=soundPrefs[mode]||1;
+  const patterns=mode==="quiz"?QUIZ_PATTERNS:RESULT_PATTERNS;
+  const p=patterns[v-1]||patterns[0];
+  const tick=()=>{uxTone(p[bgmStep%p.length],.11,.014,"triangle");bgmStep++;};
+  tick();bgmTimer=setInterval(tick,245);
 }
-function stopBgm(){if(bgmTimer)clearInterval(bgmTimer);bgmTimer=null;bgmMode=null;}
+function stopBgm(){
+  if(bgmTimer)clearInterval(bgmTimer);
+  bgmTimer=null;bgmMode=null;stopDovaAudio();
+}
 function preview(group,v){
   soundPrefs[group]=v;localStorage.setItem("norikaeRushSoundPrefs",JSON.stringify(soundPrefs));renderSoundChoices();
   if(group==="next")playNextSE(v);
@@ -1729,9 +1765,9 @@ function preview(group,v){
 }
 function renderSoundChoices(){
   const labels={
-    home:["① ポップ","② 冒険","③ アーケード","④ 駅メロ風","⑤ チル"],
+    home:["Train / MATSU"],
     quiz:["① テンポ","② 集中","③ RUSH","④ 緊張感","⑤ クイズ番組風"],
-    resultBgm:["① 勝利","② お祝い","③ ゲームクリア","④ ランキング","⑤ 余韻"]
+    resultBgm:["アフター・ファンファーレ / 藍舟"]
   };
   document.querySelectorAll(".sound-choices").forEach(box=>{
     const g=box.dataset.group;box.innerHTML="";
