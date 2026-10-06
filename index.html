@@ -324,6 +324,22 @@ button{-webkit-tap-highlight-color:transparent}
 @media(max-width:600px){.master-celebration{min-height:515px}.master-content{padding:20px 10px 16px}.master-train-wrap{height:100px}.master-certificate{max-width:94%;padding:15px 13px}.cert-body{font-size:12px}}
 
 </style>
+
+<style>
+/* ===== HOW TO PLAY ===== */
+.game-mode-card{position:relative}
+.howto-mini{position:absolute;left:14px;top:14px;z-index:8;width:31px;height:31px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;background:#08284f;color:#fff;font-size:17px;font-weight:1000;box-shadow:0 4px 0 rgba(8,40,79,.18);padding:0;line-height:1}
+.howto-mini:hover{transform:translateY(-1px)}.howto-mini:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(8,40,79,.18)}
+.rush-card .howto-mini{background:#ef3340}.battle-mode-card .howto-mini{background:#6941c6}
+.howto-overlay{position:fixed;inset:0;z-index:20050;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(5,28,56,.72);backdrop-filter:blur(5px)}
+.howto-overlay.open{display:flex}.howto-panel{position:relative;width:min(440px,94vw);background:linear-gradient(180deg,#f5fbff,#fff);border:3px solid #fff;border-radius:26px;box-shadow:0 24px 70px rgba(3,16,30,.35);overflow:hidden;animation:howtoPop .18s ease-out}
+@keyframes howtoPop{from{transform:scale(.92) translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.howto-head{padding:22px 54px 17px;text-align:center;background:linear-gradient(135deg,#08284f,#164e87);color:#fff}.howto-head .icon{font-size:37px;line-height:1}.howto-head h2{margin:5px 0 2px;font-size:25px}.howto-head p{margin:0;color:#bcd8f1;font-size:11px;font-weight:900;letter-spacing:.08em}
+.howto-close{position:absolute;right:13px;top:13px;width:35px;height:35px;border:0;border-radius:50%;background:#ffffff24;color:#fff;font-size:20px;font-weight:1000}
+.howto-body{padding:18px}.howto-rule{display:flex;gap:12px;align-items:flex-start;padding:12px 11px;border-bottom:1px dashed #d7e3ef}.howto-rule:last-of-type{border-bottom:0}.howto-num{flex:0 0 34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#ffd84c;color:#08284f;font-weight:1000;box-shadow:0 3px 0 #e5b923}.howto-rule strong{display:block;color:#08284f;font-size:14px;margin:1px 0 3px}.howto-rule span{display:block;color:#667085;font-size:12px;line-height:1.55;font-weight:750}
+.howto-goal{margin:10px 0 3px;padding:12px 14px;border-radius:15px;text-align:center;background:#fff6d7;border:1px solid #f4d16d;color:#7a4d00;font-size:13px;font-weight:1000}.howto-ok{width:100%;margin-top:13px;border:0;border-radius:14px;padding:13px;background:#ef3340;color:#fff;font-weight:1000;box-shadow:0 5px 0 #b91c29}.howto-ok:active{transform:translateY(3px);box-shadow:0 2px 0 #b91c29}
+@media(max-width:760px){.howto-mini{left:10px;top:10px;width:29px;height:29px}.howto-panel{border-radius:22px}.howto-head{padding-top:19px}.howto-body{padding:14px}.howto-rule{padding:10px 8px}}
+</style>
 </head>
 <body>
 <div id="correctNow" class="correct-now">正解！</div>
@@ -346,6 +362,7 @@ button{-webkit-tap-highlight-color:transparent}
           <div class="game-menu-title"><span>🎮</span> MODE SELECT <small>プレイモードを選択</small></div>
           <div class="playtype-grid">
             <div class="playtype-card normal-card game-mode-card">
+              <button class="howto-mini" type="button" aria-label="通常モードの遊び方" onclick="openHowTo('normal')">?</button>
               <div class="mode-icon">🚉</div><div class="mode-ribbon">5 QUESTIONS</div>
               <h3>通常モード</h3>
               <p>1問20秒・全5問。結果からあなたの「東京偏差値」を判定。</p>
@@ -356,12 +373,14 @@ button{-webkit-tap-highlight-color:transparent}
               </div>
             </div>
             <div class="playtype-card rush-card game-mode-card rush-glow">
+              <button class="howto-mini" type="button" aria-label="ラッシュモードの遊び方" onclick="openHowTo('rush')">?</button>
               <div class="mode-icon">🔥</div><div class="mode-ribbon rush-ribbon">ENDLESS</div>
               <h3>ラッシュモード</h3>
               <p>間違えるまで連続挑戦。100問連続正解で「乗り換えRUSH MASTER」認定。</p>
               <button class="primary rush-start" onclick="startRush()">🚃 RUSH START <span>→</span></button>
             </div>
             <div class="playtype-card game-mode-card battle-mode-card">
+              <button class="howto-mini" type="button" aria-label="バトルモードの遊び方" onclick="openHowTo('battle')">?</button>
               <div class="mode-icon">⚔️</div><div class="mode-ribbon battle-ribbon">1 ON 1</div>
               <h3>バトルモード</h3>
               <p>20秒・5点先取。相手より先に最速ルートを見抜こう。</p>
@@ -1893,6 +1912,24 @@ function syncScreenAudio(){
 }
 document.addEventListener("pointerdown",()=>{uxAudio();syncScreenAudio();},{once:true});
 window.addEventListener("load",()=>{renderSoundChoices();});
+</script>
+
+
+<div id="howToOverlay" class="howto-overlay" onclick="if(event.target===this)closeHowTo()" aria-hidden="true">
+  <div class="howto-panel" role="dialog" aria-modal="true" aria-labelledby="howToTitle">
+    <div class="howto-head"><button class="howto-close" type="button" onclick="closeHowTo()">×</button><div id="howToIcon" class="icon">🚉</div><h2 id="howToTitle">遊び方</h2><p id="howToSub">HOW TO PLAY</p></div>
+    <div class="howto-body"><div id="howToRules"></div><div id="howToGoal" class="howto-goal"></div><button class="howto-ok" type="button" onclick="closeHowTo()">OK！ わかった</button></div>
+  </div>
+</div>
+<script>
+const HOWTO_DATA={
+ normal:{icon:'🚉',title:'通常モードの遊び方',sub:'5 QUESTIONS · 20 SEC',rules:[['出発駅と到着駅をチェック','表示された2駅を見て、最も実用的な乗換ルートを考えよう。'],['4択からルートを選ぶ','1問20秒。初級・中級・上級で必要な乗換回数が変わります。'],['全5問に挑戦','正解数と回答内容から、あなたの「東京偏差値」を判定します。']],goal:'🏆 5問全問正解＆高偏差値を目指そう！'},
+ rush:{icon:'🔥',title:'ラッシュモードの遊び方',sub:'ENDLESS RUSH · 20 SEC',rules:[['連続正解を続けよう','1問20秒。正しい乗換ルートを選び続けるエンドレスチャレンジ。'],['1回のミスで終了','間違えた時点でRUSH終了。そこまでの連続正解数が記録になります。'],['100問突破でMASTER','100問連続正解すると、特別演出と認定証が出現します。']],goal:'🎆 100問連続正解で「乗り換えRUSH MASTER」認定！'},
+ battle:{icon:'⚔️',title:'バトルモードの遊び方',sub:'1 ON 1 · FIRST TO 5',rules:[['相手より早く見抜け','1問20秒。4択から最速ルートを選び、相手より先に正解を狙います。'],['正解＋1・誤答−1','誤答するとハートも1つ減少。相手が誤答した場合は、あなたに回答チャンス。'],['5点先取で勝利','先に5点を取るか、相手のハートをすべてなくせば勝利です。']],goal:'⚡ 勝利を重ねてRatingを上げ、Sランクを目指そう！'}
+};
+function openHowTo(mode){const d=HOWTO_DATA[mode];if(!d)return;document.getElementById('howToIcon').textContent=d.icon;document.getElementById('howToTitle').textContent=d.title;document.getElementById('howToSub').textContent=d.sub;document.getElementById('howToRules').innerHTML=d.rules.map((r,i)=>`<div class="howto-rule"><div class="howto-num">${i+1}</div><div><strong>${r[0]}</strong><span>${r[1]}</span></div></div>`).join('');document.getElementById('howToGoal').textContent=d.goal;const o=document.getElementById('howToOverlay');o.classList.add('open');o.setAttribute('aria-hidden','false');}
+function closeHowTo(){const o=document.getElementById('howToOverlay');o.classList.remove('open');o.setAttribute('aria-hidden','true');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHowTo()});
 </script>
 
 <section id="battleOverlay" class="battle-overlay" aria-label="バトルモード">
