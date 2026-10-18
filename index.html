@@ -1,9 +1,17 @@
 <!DOCTYPE html>
 <html lang="ja">
+<!-- NORIKAE RUSH production build | norikae-rush.jp -->
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>乗り換えRUSH</title>
+  <link rel="canonical" href="https://norikae-rush.jp/" />
+  <meta name="description" content="東京の乗り換え力を試す最速ルートクイズ。通常・ラッシュ・バトルの3モードで挑戦！" />
+  <meta property="og:title" content="乗り換えRUSH" />
+  <meta property="og:description" content="あなたは最速ルートを見抜ける？ 東京の乗り換え力をゲームで勝負！" />
+  <meta property="og:url" content="https://norikae-rush.jp/" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
   <style>
     :root{
       --bg:#f5f6f8; --panel:#fff; --line:#dde2e8; --text:#101828; --muted:#667085;
@@ -752,150 +760,7 @@ const modeConfig = {
 };
 
 
-/*
-  世界ランキング用Supabase設定
-  Supabaseでプロジェクト作成後、下記2項目を入力すると自動で世界ランキングが有効になります。
-*/
-const SUPABASE_URL = "https://jpsqlxakjzacigzeidns.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_Y--IsCbiQPknZZSk0q7-4w_49QZ-b1C";
-const RANKING_TABLE = "norikae_scores";
-
-function rankingEnabled(){
-  return /^https:\/\/.+\.supabase\.co$/i.test(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 20;
-}
-
-function getPlayerId(){
-  const key="norikaeRushPlayerId";
-  try{
-    let id=localStorage.getItem(key);
-    if(!id){
-      id=(crypto && crypto.randomUUID) ? crypto.randomUUID() :
-        "p_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2);
-      localStorage.setItem(key,id);
-    }
-    return id;
-  }catch(e){
-    return "anonymous";
-  }
-}
-
-async function supabaseRequest(path, options={}){
-  if(!rankingEnabled()) throw new Error("ranking_not_configured");
-  const headers={
-    "apikey":SUPABASE_ANON_KEY,
-    "Content-Type":"application/json",
-    ...(options.headers||{})
-  };
-  const res=await fetch(SUPABASE_URL+"/rest/v1/"+path,{...options,headers});
-  if(!res.ok) throw new Error("ranking_http_"+res.status);
-  return res;
-}
-
-async function submitWorldScore(mode, scoreValue, totalScoreValue=0){
-  if(!rankingEnabled()) return null;
-
-  const playerId=getPlayerId();
-  const nextScore=Number(scoreValue)||0;
-  const nextTotal=Number(totalScoreValue)||0;
-
-  // DB側のRPCで「1ユーザー×1モード＝最高記録1件」を安全に更新
-  const rpcRes=await supabaseRequest("rpc/submit_norikae_score",{
-    method:"POST",
-    headers:{"Prefer":"return=representation"},
-    body:JSON.stringify({
-      p_player_id:playerId,
-      p_mode:mode,
-      p_score_value:nextScore,
-      p_total_score:nextTotal,
-      p_user_agent:navigator.userAgent.slice(0,180)
-    })
-  });
-
-  const rpcData=await rpcRes.json();
-  let effectiveScore=nextScore;
-  if(Array.isArray(rpcData) && rpcData.length && Number.isFinite(Number(rpcData[0].score_value))){
-    effectiveScore=Number(rpcData[0].score_value);
-  }else if(rpcData && Number.isFinite(Number(rpcData.score_value))){
-    effectiveScore=Number(rpcData.score_value);
-  }
-
-  return getWorldRank(mode,effectiveScore);
-}
-async function getWorldRank(mode, scoreValue){
-  if(!rankingEnabled()) return null;
-
-  const totalRes=await supabaseRequest(
-    `${RANKING_TABLE}?mode=eq.${encodeURIComponent(mode)}&select=id`,
-    {headers:{"Prefer":"count=exact"}}
-  );
-  const totalHeader=totalRes.headers.get("content-range")||"";
-  const totalMatch=totalHeader.match(/\/(\d+)$/);
-  const total=totalMatch ? Number(totalMatch[1]) : 0;
-
-  const higherRes=await supabaseRequest(
-    `${RANKING_TABLE}?mode=eq.${encodeURIComponent(mode)}&score_value=gt.${encodeURIComponent(scoreValue)}&select=id`,
-    {headers:{"Prefer":"count=exact"}}
-  );
-  const higherHeader=higherRes.headers.get("content-range")||"";
-  const higherMatch=higherHeader.match(/\/(\d+)$/);
-  const higher=higherMatch ? Number(higherMatch[1]) : 0;
-
-  return {rank:higher+1,total};
-}
-
-async function refreshWorldRanks(){
-  const status=document.getElementById("worldStatus");
-  if(!rankingEnabled()){
-    if(status) status.textContent="ランキング接続前";
-    return;
-  }
-  if(status) status.textContent="世界データを集計中...";
-  const modes=["beginner","intermediate","extreme","rush"];
-  for(const mode of modes){
-    const el=document.getElementById("world-"+mode);
-    if(!el) continue;
-    let bestValue=0;
-    if(mode==="rush") bestValue=getRushBest();
-    else {
-      const best=getBest(mode);
-      bestValue=best ? best.deviation : 0;
-    }
-    if(!bestValue){ el.textContent="未参加"; continue; }
-    try{
-      const data=await getWorldRank(mode,bestValue);
-      el.textContent=data && data.total ? `${data.rank}位/${data.total}人` : "—";
-    }catch(e){
-      el.textContent="取得失敗";
-    }
-  }
-  if(status) status.textContent="世界中の匿名ユーザーの最高記録から算出";
-}
-
-async function recordNormalWorldResult(mode,deviation,totalScoreValue){
-  const el=document.getElementById("normalWorldRank");
-  if(!rankingEnabled()){ if(el) el.style.display="none"; return; }
-  if(el){ el.style.display="block"; el.textContent="🌍 世界順位を集計中..."; }
-  try{
-    const data=await submitWorldScore(mode,deviation,totalScoreValue);
-    if(el && data) el.textContent=`🌍 世界 ${data.rank}位 / ${data.total}人中`;
-    refreshWorldRanks();
-  }catch(e){
-    if(el) el.textContent="🌍 世界ランキングの取得に失敗しました";
-  }
-}
-
-async function recordRushWorldResult(correctCount){
-  const el=document.getElementById("rushWorldRank");
-  if(!rankingEnabled()){ if(el) el.style.display="none"; return; }
-  if(el){ el.style.display="block"; el.textContent="🌍 世界順位を集計中..."; }
-  try{
-    const data=await submitWorldScore("rush",correctCount,0);
-    if(el && data) el.textContent=`🌍 世界 ${data.rank}位 / ${data.total}人中`;
-    refreshWorldRanks();
-  }catch(e){
-    if(el) el.textContent="🌍 世界ランキングの取得に失敗しました";
-  }
-}
+// WORLD RANKING is disabled in the production build.
 
 let currentMode = "beginner";
 let gameType = "normal";
@@ -1745,7 +1610,7 @@ ${modeConfig[currentMode].label}｜${correctCount}/5問正解
 async function shareResult(){
   const text = buildShareText();
   const status = document.getElementById('shareStatus');
-  const url = location.href.split('?')[0].split('#')[0];
+  const url = 'https://norikae-rush.jp/';
   const canvas=document.getElementById("shareCanvas");
 
   let file=null;
@@ -1989,7 +1854,7 @@ let lastBattleRatingAfter=800;
 async function shareBattleResult(){
   const rank=ratingRank(lastBattleRatingAfter);
   const text=`⚔️ 乗り換えRUSH BATTLE 勝利！\n🏆 YOU ${bMy} - ${bRival} RIVAL\nRANK ${rank}｜Rating ${lastBattleRatingAfter.toLocaleString()}\n東京の乗り換え、どっちが強い？🚃🔥\n#乗り換えRUSH`;
-  const url=location.href.split('?')[0].split('#')[0];
+  const url='https://norikae-rush.jp/';
   try{if(navigator.share){await navigator.share({title:'乗り換えRUSH',text,url});return}}catch(e){if(e&&e.name==='AbortError')return}
   try{await navigator.clipboard.writeText(text+'\n'+url)}catch(e){}
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(url),'_blank','noopener');
