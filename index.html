@@ -1229,7 +1229,7 @@ function fitJourneyStationLabels(){
     else if(n>=6) el.style.fontSize='10px';
   });
 }
-function showAnswerJourney(timeout, isCorrect, answerLabel, explicitYourTime){
+function showAnswerJourney(timeout, isCorrect, answerLabel, explicitYourTime, elapsed = timeout ? 20 : Math.min(20, Math.round((Date.now()-questionStart)/1000))){
   clearAnswerJourneyTimers();
   const master=window.currentMaster||{};
   const transfers=Array.isArray(master.masterTransfers)?master.masterTransfers.slice():[];
@@ -1243,7 +1243,7 @@ function showAnswerJourney(timeout, isCorrect, answerLabel, explicitYourTime){
   const title=document.getElementById('answerJourneyTitle');
   const sub=document.getElementById('answerJourneySub');
   const routeEl=document.getElementById('answerJourneyRoute');
-  pendingQuestionResult={timeout,isCorrect,answerLabel,explicitYourTime};
+  pendingQuestionResult={timeout,isCorrect,answerLabel,explicitYourTime,elapsed};
   stationsBox.innerHTML=route.map((name,i)=>`<div class="answer-station ${i===0?'':(i===route.length-1?'goal':'transfer')}"><div class="answer-marker"></div><div class="answer-station-name">${escapeHtml(name)}</div></div>`).join('');
   linesBox.innerHTML=lines.map(x=>`<div class="answer-line-band">${escapeHtml(x)}</div>`).join('');
   fitJourneyStationLabels();
@@ -1284,11 +1284,12 @@ function showAnswerJourney(timeout, isCorrect, answerLabel, explicitYourTime){
 function completePendingQuestion(){
   if(!pendingQuestionResult)return;
   const p=pendingQuestionResult; pendingQuestionResult=null; clearAnswerJourneyTimers();
-  finishQuestion(p.timeout,p.isCorrect,p.answerLabel,p.explicitYourTime);
+  finishQuestion(p.timeout,p.isCorrect,p.answerLabel,p.explicitYourTime,p.elapsed);
 }
 function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
 
 function answerChoice(index){
+  const elapsed = Math.min(20, Math.round((Date.now()-questionStart)/1000));
   clearInterval(timerId);
   const praiseEl=document.getElementById("praiseLine");
   if(praiseEl) praiseEl.classList.remove("show");
@@ -1318,7 +1319,7 @@ function answerChoice(index){
   const chosenCalc = calcChosenRouteTime(path);
   const chosenTime = Number.isFinite(chosen.time) ? chosen.time : chosenCalc.time;
 
-  showAnswerJourney(false, correct, chosen.label, chosenTime);
+  showAnswerJourney(false, correct, chosen.label, chosenTime, elapsed);
 }
 
 function goHome(){
@@ -1342,12 +1343,10 @@ function formatLineGuide(segments){
   }).join("");
 }
 
-function finishQuestion(timeout, isCorrect=false, answerLabel="", explicitYourTime=null){
+function finishQuestion(timeout, isCorrect=false, answerLabel="", explicitYourTime=null, elapsed = timeout ? 20 : Math.min(20, Math.round((Date.now()-questionStart)/1000))){
   const best = shortestTransferRoute(currentFrom,currentTo);
   const chosen = calcChosenRouteTime(path);
   const your = explicitYourTime !== null ? explicitYourTime : (timeout ? Infinity : chosen.time);
-  const elapsed = Math.min(20, Math.round((Date.now()-questionStart)/1000));
-
   let score = 0;
   let baseScore = 0;
   let timePenalty = 0;
