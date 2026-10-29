@@ -1,6 +1,8 @@
 name: Game regression tests
 
 on:
+  push:
+    branches: [main, 'automation/**', 'fix/**', 'feature/**']
   pull_request:
     branches: [main]
   workflow_dispatch:
