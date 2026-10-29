@@ -331,6 +331,15 @@ button{-webkit-tap-highlight-color:transparent}
 .master-certificate:before,.master-certificate:after{content:"★";position:absolute;top:10px;color:#d8a700;font-size:22px}.master-certificate:before{left:13px}.master-certificate:after{right:13px}.cert-head{font-size:11px;font-weight:1000;letter-spacing:.28em;color:#9c6700}.cert-title{font-family:serif;font-size:clamp(27px,7vw,38px);font-weight:1000;letter-spacing:.08em;margin:6px 0 10px;border-bottom:2px solid #d8a700;padding-bottom:8px}.cert-body{font-size:13px;font-weight:900;line-height:1.8}.cert-master{display:block;font-size:clamp(20px,5vw,28px);color:#ef3340;margin:6px 0;font-weight:1000}.cert-seal{width:62px;height:62px;margin:10px auto 0;border-radius:50%;display:grid;place-items:center;border:4px double #ef3340;color:#ef3340;font-size:10px;font-weight:1000;line-height:1.05;transform:rotate(-7deg);background:#fff8e8}.master-foot{margin-top:18px;font-size:11px;color:#bcd5ec;font-weight:900}.master-celebration + .mode-chip{display:none}
 @media(max-width:600px){.master-celebration{min-height:515px}.master-content{padding:20px 10px 16px}.master-train-wrap{height:100px}.master-certificate{max-width:94%;padding:15px 13px}.cert-body{font-size:12px}}
 
+/* Equal battle panels, including the BOT status row. */
+.battle-board{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:stretch}
+.battle-round{align-self:center}
+.battle-player{min-width:0;display:flex;flex-direction:column;align-items:center}
+.battle-avatar-slot{height:50px;display:flex;align-items:center;justify-content:center}
+.battle-player .fighter-icon{margin:0}
+.battle-player .battle-clock{flex-shrink:0;margin:0 auto}
+.battle-press-time{height:12px;line-height:12px}
+.battle-countdown{min-height:1.5em;font-size:14px;color:#fff}
 </style>
 
 <style>
@@ -340,7 +349,7 @@ button{-webkit-tap-highlight-color:transparent}
 .howto-mini:hover{transform:translateY(-1px)}.howto-mini:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(8,40,79,.18)}
 .rush-card .howto-mini{background:#ef3340}.battle-mode-card .howto-mini{background:#6941c6}
 .howto-overlay{position:fixed;inset:0;z-index:20050;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(5,28,56,.72);backdrop-filter:blur(5px)}
-.howto-overlay.open{display:flex}.howto-panel{position:relative;width:min(440px,94vw);background:linear-gradient(180deg,#f5fbff,#fff);border:3px solid #fff;border-radius:26px;box-shadow:0 24px 70px rgba(3,16,30,.35);overflow:hidden;animation:howtoPop .18s ease-out}
+.howto-overlay.open{display:flex}.howto-panel{max-height:calc(100dvh - 36px);overflow-y:auto;position:relative;width:min(440px,94vw);background:linear-gradient(180deg,#f5fbff,#fff);border:3px solid #fff;border-radius:26px;box-shadow:0 24px 70px rgba(3,16,30,.35);animation:howtoPop .18s ease-out}
 @keyframes howtoPop{from{transform:scale(.92) translateY(12px);opacity:0}to{transform:none;opacity:1}}
 .howto-head{padding:22px 54px 17px;text-align:center;background:linear-gradient(135deg,#08284f,#164e87);color:#fff}.howto-head .icon{font-size:37px;line-height:1}.howto-head h2{margin:5px 0 2px;font-size:25px}.howto-head p{margin:0;color:#bcd8f1;font-size:11px;font-weight:900;letter-spacing:.08em}
 .howto-close{position:absolute;right:13px;top:13px;width:35px;height:35px;border:0;border-radius:50%;background:#ffffff24;color:#fff;font-size:20px;font-weight:1000}
@@ -962,8 +971,17 @@ function drawShareCard(){
   ctx.clearRect(0,0,c.width,c.height);
   ctx.fillStyle="#f7f8fa";ctx.fillRect(0,0,c.width,c.height);
   ctx.fillStyle="#101828";ctx.textAlign="center";
-  ctx.font="900 62px sans-serif";ctx.fillText("乗り換え RUSH",540,150);
+  ctx.font="900 62px sans-serif";ctx.fillText("乗り換え",400,150);
   ctx.fillStyle="#d92d20";ctx.font="italic 900 62px sans-serif";ctx.fillText("RUSH",720,150);
+  if(gameType==='rush'){
+    ctx.fillStyle='#667085';ctx.font='800 34px sans-serif';ctx.fillText('ラッシュモード',540,245);
+    ctx.fillStyle='#101828';ctx.font='900 160px sans-serif';ctx.fillText(String(rushCorrect),540,525);
+    ctx.font='900 54px sans-serif';ctx.fillText('問連続正解',540,640);
+    ctx.fillStyle='#7a4d00';ctx.font='900 42px sans-serif';ctx.fillText(rushCorrect>=100?'RUSH MASTER 達成！':'100問連続正解でMASTER！',540,800);
+    ctx.strokeStyle='#f0b84b';ctx.lineWidth=8;ctx.strokeRect(90,70,900,1030);
+    ctx.fillStyle='#667085';ctx.font='700 32px sans-serif';ctx.fillText('https://norikae-rush.jp/',540,1160);
+    return;
+  }
   ctx.fillStyle="#667085";ctx.font="800 34px sans-serif";ctx.fillText(modeConfig[currentMode].label,540,245);
   ctx.fillStyle="#101828";ctx.font="900 44px sans-serif";ctx.fillText("東京偏差値",540,385);
   ctx.font="1000 190px sans-serif";ctx.fillText(String(lastDeviation),540,585);
@@ -1611,6 +1629,7 @@ ${modeConfig[currentMode].label}｜${correctCount}/5問正解
 #乗り換えRUSH`;
 }
 async function shareResult(){
+  drawShareCard();
   const text = buildShareText();
   const status = document.getElementById('shareStatus');
   const url = 'https://norikae-rush.jp/';
@@ -1792,8 +1811,8 @@ window.addEventListener("load",()=>{renderSoundChoices();});
 <script>
 const HOWTO_DATA={
  normal:{icon:'🚉',title:'通常モードの遊び方',sub:'5 QUESTIONS · 20 SEC',rules:[['出発駅と到着駅をチェック','表示された2駅を見て、最も実用的な乗換ルートを考えよう。'],['4択からルートを選ぶ','1問20秒。初級・中級・上級で必要な乗換回数が変わります。'],['全5問に挑戦','正解数と回答内容から、あなたの「東京偏差値」を判定します。']],goal:'🏆 5問全問正解＆高偏差値を目指そう！'},
- rush:{icon:'🔥',title:'ラッシュモードの遊び方',sub:'ENDLESS RUSH · 20 SEC',rules:[['連続正解を続けよう','1問20秒。正しい乗換ルートを選び続けるエンドレスチャレンジ。'],['1回のミスで終了','間違えた時点でRUSH終了。そこまでの連続正解数が記録になります。'],['100問突破でMASTER','100問連続正解すると、特別演出と認定証が出現します。']],goal:'🎆 100問連続正解で「乗り換えRUSH MASTER」認定！'},
- battle:{icon:'⚔️',title:'バトルモードの遊び方',sub:'1 ON 1 · FIRST TO 5',rules:[['相手より早く見抜け','1問20秒。4択から最速ルートを選び、相手より先に正解を狙います。'],['正解＋1・誤答−1','誤答するとハートも1つ減少。相手が誤答した場合は、あなたに回答チャンス。'],['5点先取で勝利','先に5点を取るか、相手のハートをすべてなくせば勝利です。']],goal:'⚡ 勝利を重ねてRatingを上げ、Sランクを目指そう！'}
+ rush:{icon:'🔥',title:'ラッシュモードの遊び方',sub:'100 QUESTIONS · 20 SEC',rules:[['連続正解を続けよう','1問20秒。正しい乗換ルートを選び、100問連続正解を目指すチャレンジ。'],['1回のミスで終了','間違えるか時間切れになるとRUSH終了。そこまでの連続正解数が記録になります。'],['100問達成でMASTER','100問連続正解すると、特別演出と認定証が出現します。']],goal:'🎆 100問連続正解で「乗り換えRUSH MASTER」認定！'},
+ battle:{icon:'⚔️',title:'バトルモードの遊び方',sub:'1 ON 1 · FIRST TO 5',rules:[['相手より早く見抜け','1問20秒。4択から最速ルートを選び、BOTより先に正解を狙います。'],['正解＋1・誤答−1','誤答するとハートも1つ減少。相手が誤答した場合は、あなたに回答チャンス。'],['5点先取で勝利','先に5点を取るか、相手のハートをすべてなくせば勝利です。各結果は5秒後に次問へ進みます（ボタンでスキップ可、勝敗確定時・最終問題は手動）。']],goal:'⚡ 勝利を重ねてRatingを上げ、Sランクを目指そう！'}
 };
 function openHowTo(mode){const d=HOWTO_DATA[mode];if(!d)return;document.getElementById('howToIcon').textContent=d.icon;document.getElementById('howToTitle').textContent=d.title;document.getElementById('howToSub').textContent=d.sub;document.getElementById('howToRules').innerHTML=d.rules.map((r,i)=>`<div class="howto-rule"><div class="howto-num">${i+1}</div><div><strong>${r[0]}</strong><span>${r[1]}</span></div></div>`).join('');document.getElementById('howToGoal').textContent=d.goal;const o=document.getElementById('howToOverlay');o.classList.add('open');o.setAttribute('aria-hidden','false');}
 function closeHowTo(){const o=document.getElementById('howToOverlay');o.classList.remove('open');o.setAttribute('aria-hidden','true');}
@@ -1804,7 +1823,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHowTo()});
   <div class="battle-shell">
     <div class="battle-top"><div class="battle-logo">乗り換え<span>RUSH BATTLE</span></div><button class="battle-close" onclick="closeBattle()">トップへ戻る</button></div>
     <div class="battle-board">
-      <div id="battleUserPanel" class="battle-player user"><div class="fighter-icon red"><span class="fighter-person"></span></div>あなた<b id="battleMyScore">0</b><div id="battleHearts" class="heart-row"></div><div class="rank-chip">RANK <strong id="battleMyRank">C</strong></div></div>
+      <div id="battleUserPanel" class="battle-player user"><div class="battle-avatar-slot"><div class="fighter-icon red"><span class="fighter-person"></span></div></div><div class="battle-press-time" aria-hidden="true">&nbsp;</div>あなた<b id="battleMyScore">0</b><div id="battleHearts" class="heart-row"></div><div class="rank-chip">RANK <strong id="battleMyRank">C</strong></div></div>
       <div id="battleRound" class="battle-round">第1問<br><small>5点先取</small></div>
       <div id="battleRivalPanel" class="battle-player rival"><div id="battleRivalClock" class="battle-clock"><span class="fighter-icon blue" style="width:39px;height:39px;border-width:2px"><i class="fighter-person" style="transform:scale(.68)"></i></span></div><div id="battlePressTime" class="battle-press-time">BOT・回答待ち</div>相手<b id="battleRivalScore">0</b><div id="battleRivalHearts" class="heart-row"></div><div class="rank-chip">BOT <strong id="battleRivalRank">C</strong></div></div>
     </div>
@@ -1817,7 +1836,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHowTo()});
     </div></div>
   </div>
 </section>
-<div id="battleFeedback" class="battle-feedback"><div><h2 id="battleFeedbackTitle"></h2><p id="battleFeedbackText"></p><button class="primary" onclick="nextBattleQuestion()">次の問題へ</button></div></div>
+<div id="battleFeedback" class="battle-feedback"><div><h2 id="battleFeedbackTitle"></h2><p id="battleFeedbackText"></p><p id="battleCountdown" class="battle-countdown" role="timer" aria-label="次の問題までの残り時間"></p><button class="primary" onclick="nextBattleQuestion()">次の問題へ</button></div></div>
 <div id="battleJourney" class="battle-journey"><div class="battle-journey-inner"><div id="battleJourneyTitle" class="battle-journey-title">🚃 正解ルートを走行中！</div><div class="battle-journey-stage"><div class="battle-track"></div><div id="battleJStations" class="battle-jstations"></div><div id="battleTrain" class="battle-train"><img id="battleTrainImg" alt="赤い電車"></div></div><div id="battleJRoute" class="battle-jroute"></div><div id="battleJLines" class="battle-jlines"></div></div></div>
 <div id="battleVictory" class="battle-victory"><div id="victoryConfetti" class="victory-confetti"></div><div class="party-popper left">🎉</div><div class="party-popper right">🎊</div><div class="victory-shell"><span class="victory-badge">BATTLE RESULT</span><div class="victory-title">YOU WIN!</div><div class="victory-sub">最速ルートを制した！</div><div class="victory-train-stage"><img id="victoryTrainImg" alt="勝利した赤い電車"><div class="victory-rail"></div></div><div class="victory-card"><div class="victory-score"><div><small>あなた</small><strong id="victoryMyScore">5</strong></div><b>VS</b><div class="op"><small>相手</small><strong id="victoryRivalScore">0</strong></div></div><div class="victory-stats"><div class="victory-stat"><b id="victoryQuestions">5</b><small>獲得問題</small></div><div class="victory-stat"><b id="victoryFast">—</b><small>最速回答</small></div><div class="victory-stat"><b id="victoryRank">C</b><small>現在ランク</small></div></div><div id="victoryRating" class="victory-rating">C RANK · 800 → 824（+24）</div><div class="victory-actions"><button class="primary share-main" onclick="shareBattleResult()">📣 結果をシェア</button><button class="primary" onclick="retryBattle()">もう一度対戦</button><button class="ghost" onclick="closeBattle()">トップへ戻る</button></div></div></div></div>
 <script>
@@ -1830,9 +1849,10 @@ let bRound=0,bMy=0,bRival=0,bTick=null,bStart=0,bDone=false,bSecond=false,bPress
 const b$=id=>document.getElementById(id);
 // All delayed battle work belongs to the current question/session token.
 const bTimeouts=new Set();
+let bFeedbackReady=false;
 function battleLater(callback,delay){const token=bQuestionToken;const id=setTimeout(()=>{bTimeouts.delete(id);if(token===bQuestionToken)callback()},delay);bTimeouts.add(id);return id}
-function clearBattleAsync(){bQuestionToken++;bDone=true;for(const id of bTimeouts)clearTimeout(id);bTimeouts.clear();clearTimeout(bBotTimer);bBotTimer=null;clearInterval(bTick);bTick=null;stopQuizBgm()}
-function resetBattleOverlays(){['battleFeedback','battleJourney','battleVictory'].forEach(id=>b$(id).classList.remove('show'));const btn=b$('battleFeedback').querySelector('button');btn.textContent='次の問題へ';btn.onclick=nextBattleQuestion}
+function clearBattleAsync(){bFeedbackReady=false;bQuestionToken++;bDone=true;for(const id of bTimeouts)clearTimeout(id);bTimeouts.clear();clearTimeout(bBotTimer);bBotTimer=null;clearInterval(bTick);bTick=null;stopQuizBgm()}
+function resetBattleOverlays(){b$('battleCountdown').textContent='';['battleFeedback','battleJourney','battleVictory'].forEach(id=>b$(id).classList.remove('show'));const btn=b$('battleFeedback').querySelector('button');btn.textContent='次の問題へ';btn.onclick=nextBattleQuestion}
 function battleAudio(){if(!bAudio)bAudio=new(window.AudioContext||window.webkitAudioContext)();if(bAudio.state==='suspended')bAudio.resume();return bAudio}
 function battleTone(freq,delay,dur,vol=.06,type='sine'){const a=battleAudio(),o=a.createOscillator(),g=a.createGain(),t=a.currentTime+delay;o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+.03)}
 function playBattleIntroSound(){battleTone(523,0,.16,.035);battleTone(659,.14,.18,.035);battleTone(784,.3,.3,.04)}
@@ -1854,8 +1874,25 @@ function markBattlePress(){if(bPressed)return;bPressed=true;const t=Math.min(20,
 function rivalWrong(){bRivalMistakes++;bRival=Math.max(0,bRival-1);renderRivalHearts();b$('battleRivalPanel').classList.remove('damage-flash');void b$('battleRivalPanel').offsetWidth;b$('battleRivalPanel').classList.add('damage-flash');if(bRivalMistakes>=5){bWonByHearts=true;finishBattleRound('botheartloss','相手のハートがなくなった！','あなたの勝ち');return true}return false}
 function battleRivalAnswers(token=bQuestionToken){if(bDone||bSecond||token!==bQuestionToken)return;markBattlePress();if(Math.random()<.72){bRival++;finishBattleRound('rival','相手が正解！','相手が1問ゲット')}else{if(rivalWrong())return;bSecond=true;b$('battleNotice').textContent='相手は不正解！ あなたに回答権'}}
 function battleAnswer(i,btn){if(bDone||btn.disabled)return;clearTimeout(bBotTimer);const elapsed=(performance.now()-bStart)/1000,q=BATTLE_Q[bRound%BATTLE_Q.length],ok=i===q.answer;document.querySelectorAll('.battle-option').forEach((x,n)=>{x.disabled=true;if(n===q.answer)x.classList.add('correct')});if(!ok)btn.classList.add('wrong');if(ok){bMy++;bCorrect++;bFast=Math.min(bFast,elapsed);finishBattleRound('me','正解！','あなたが1問ゲット')}else{bMistakes++;renderBattleHearts();bMy=Math.max(0,bMy-1);b$('battleUserPanel').classList.remove('damage-flash');void b$('battleUserPanel').offsetWidth;b$('battleUserPanel').classList.add('damage-flash');battleTone(145,0,.3,.04,'sawtooth');if(bMistakes>=5){finishBattleRound('heartloss','ハートがなくなった！','相手の勝ち');return}if(bSecond){finishBattleRound('draw','両者不正解','次の問題へ')}else{bSecond=true;b$('battleNotice').textContent='あなたは不正解…BOTが考え中';const token=bQuestionToken;bBotTimer=battleLater(()=>{if(bDone||token!==bQuestionToken)return;markBattlePress();if(Math.random()<.72){bRival++;finishBattleRound('rival','相手が正解！','相手が1問ゲット')}else{if(rivalWrong())return;finishBattleRound('draw','両者不正解','次の問題へ')}},1500+Math.random()*2000)}}}
-function finishBattleRound(winner,title,text){if(bDone)return;clearBattleAsync();b$('battleFeedbackTitle').textContent=title;b$('battleFeedbackText').textContent=text;if(winner==='draw'||winner==='heartloss'||winner==='botheartloss')b$('battleFeedback').classList.add('show');else playBattleJourney(title)}
-function playBattleJourney(title){const q=BATTLE_Q[bRound%BATTLE_Q.length],transfer=q.transfers[0],train=b$('battleTrain');b$('battleJourneyTitle').textContent=title==='相手が正解！'?'🚅 相手の正解ルート':'🚃 あなたの正解ルート';b$('battleJRoute').textContent=`${q.from} → ${transfer} → ${q.to}`;b$('battleJLines').textContent=`利用路線：${q.lines.join(' → ')}${q.masterTime?` ／ 約${q.masterTime}分`:''}`;b$('battleJStations').innerHTML=[q.from,transfer,q.to].map(x=>`<div class="battle-jstation"><i></i><b>${x}</b></div>`).join('');train.style.transition='none';train.style.left='4%';b$('battleJourney').classList.add('show');battleLater(()=>{train.style.transition='left .75s cubic-bezier(.35,.1,.18,1)';train.style.left='calc(50% - 55px)'},180);battleLater(()=>train.style.left='calc(96% - 110px)',1050);battleLater(()=>{b$('battleJourney').classList.remove('show');b$('battleFeedback').classList.add('show')},2050)}
+function battleMatchFinished(){return bMy>=5||bRival>=5||bMistakes>=5||bWonByHearts}
+function showBattleFeedback(){
+  b$('battleFeedback').classList.add('show');
+  bFeedbackReady=true;
+  const countdown=b$('battleCountdown');
+  countdown.textContent='';
+  // A match result (or the deck's last question) must be advanced manually.
+  if(battleMatchFinished()||bRound>=BATTLE_Q.length-1)return;
+  const deadline=performance.now()+5000;
+  function tick(){
+    const remaining=Math.max(0,Math.ceil((deadline-performance.now())/1000));
+    countdown.textContent=`${remaining}秒後に次の問題へ`;
+    if(remaining===0){nextBattleQuestion();return}
+    battleLater(tick,Math.min(1000,deadline-performance.now()));
+  }
+  tick();
+}
+function finishBattleRound(winner,title,text){if(bDone)return;clearBattleAsync();b$('battleFeedbackTitle').textContent=title;b$('battleFeedbackText').textContent=text;if(winner==='draw'||winner==='heartloss'||winner==='botheartloss')showBattleFeedback();else playBattleJourney(title)}
+function playBattleJourney(title){const q=BATTLE_Q[bRound%BATTLE_Q.length],transfer=q.transfers[0],train=b$('battleTrain');b$('battleJourneyTitle').textContent=title==='相手が正解！'?'🚅 相手の正解ルート':'🚃 あなたの正解ルート';b$('battleJRoute').textContent=`${q.from} → ${transfer} → ${q.to}`;b$('battleJLines').textContent=`利用路線：${q.lines.join(' → ')}${q.masterTime?` ／ 約${q.masterTime}分`:''}`;b$('battleJStations').innerHTML=[q.from,transfer,q.to].map(x=>`<div class="battle-jstation"><i></i><b>${x}</b></div>`).join('');train.style.transition='none';train.style.left='4%';b$('battleJourney').classList.add('show');battleLater(()=>{train.style.transition='left .75s cubic-bezier(.35,.1,.18,1)';train.style.left='calc(50% - 55px)'},180);battleLater(()=>train.style.left='calc(96% - 110px)',1050);battleLater(()=>{b$('battleJourney').classList.remove('show');showBattleFeedback()},2050)}
 function applyBattleRating(delta){if(bRatingApplied)return {before:bRating,after:bRating};const before=bRating;bRating=Math.max(0,bRating+delta);localStorage.setItem('norikaeBattleRating',bRating);bRatingApplied=true;renderBattleRanks();return {before,after:bRating}}
 function fillVictoryConfetti(){const box=b$('victoryConfetti'),colors=['#ef3340','#ffd84c','#2f72e9','#39b86b','#9b5de5','#ff7a00'];box.innerHTML=Array.from({length:70},(_,i)=>`<i class="confetti-piece" style="left:${Math.random()*100}%;background:${colors[i%colors.length]};--fall:${3+Math.random()*3}s;--delay:${-Math.random()*5}s;--drift:${-80+Math.random()*160}px;--rot:${Math.random()*180}deg"></i>`).join('')}
 let lastBattleRatingAfter=800;
@@ -1868,7 +1905,7 @@ async function shareBattleResult(){
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(url),'_blank','noopener');
 }
 function showBattleVictory(){const r=applyBattleRating(24);lastBattleRatingAfter=r.after;b$('victoryMyScore').textContent=bMy;b$('victoryRivalScore').textContent=bRival;b$('victoryQuestions').textContent=bCorrect;b$('victoryFast').textContent=bFast===99?'—':bFast.toFixed(2)+'秒';b$('victoryRank').textContent=ratingRank(r.after);b$('victoryRating').textContent=`${ratingRank(r.after)} RANK · ${r.before} → ${r.after}（+24）`;fillVictoryConfetti();b$('battleVictory').classList.add('show');[523,659,784,1047,1319].forEach((f,i)=>battleTone(f,i*.09,.25,.025,'triangle'))}
-function nextBattleQuestion(){clearBattleAsync();b$('battleFeedback').classList.remove('show');if(bMy>=5||bWonByHearts){showBattleVictory();return}if(bRival>=5||bMistakes>=5){const r=applyBattleRating(-18);b$('battleFeedbackTitle').textContent='YOU LOSE';b$('battleFeedbackText').textContent=(bMistakes>=5?'5回間違えたため敗北':`${bMy} - ${bRival}`)+` ／ ${ratingRank(r.after)} RANK ${r.after}（-18）`;b$('battleFeedback').classList.add('show');const btn=b$('battleFeedback').querySelector('button');btn.textContent='トップへ戻る';btn.onclick=()=>{btn.textContent='次の問題へ';btn.onclick=nextBattleQuestion;closeBattle()};return}bRound++;loadBattleQuestion()}
+function nextBattleQuestion(){if(!bFeedbackReady||!b$('battleOverlay').classList.contains('open'))return;clearBattleAsync();b$('battleCountdown').textContent='';b$('battleFeedback').classList.remove('show');if(bMy>=5||bWonByHearts){showBattleVictory();return}if(bRival>=5||bMistakes>=5){const r=applyBattleRating(-18);b$('battleFeedbackTitle').textContent='YOU LOSE';b$('battleFeedbackText').textContent=(bMistakes>=5?'5回間違えたため敗北':`${bMy} - ${bRival}`)+` ／ ${ratingRank(r.after)} RANK ${r.after}（-18）`;b$('battleFeedback').classList.add('show');const btn=b$('battleFeedback').querySelector('button');btn.textContent='トップへ戻る';btn.onclick=()=>{btn.textContent='次の問題へ';btn.onclick=nextBattleQuestion;closeBattle()};return}bRound++;loadBattleQuestion()}
 renderHomeBattleRating();
 </script>
 </body>
