@@ -1,0 +1,41 @@
+name: Game regression tests
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-tests:
+    name: Chromium browser tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout proposed changes
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright (test dependency)
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install Chromium and system dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Configure browser executable
+        run: echo "CHROMIUM_PATH=$(node -e 'process.stdout.write(require("playwright").chromium.executablePath())')" >> "$GITHUB_ENV"
+      - name: Start local server
+        run: |
+          python3 -m http.server 8011 --bind 127.0.0.1 > /tmp/norikae-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8011/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/norikae-http.log
+          exit 1
+      - name: Run regression tests
+        env:
+          TEST_URL: http://127.0.0.1:8011
+        run: node --test tests/*.cjs
