@@ -1451,6 +1451,9 @@ function showRushFinal(){
   const sub=document.getElementById('rushSub');
 
   const masterCelebration=document.getElementById('masterCelebration');
+  // Restore result elements hidden by the previous 100-question celebration.
+  [document.querySelector('#rushResultArea .result-eyebrow'),document.querySelector('#rushResultArea .rush-result-main'),msg,bestEl].forEach(el=>{if(el) el.style.display=''});
+  if(masterCelebration) masterCelebration.classList.remove('show');
   if(rushCorrect>=100){
     msg.textContent="100問連続正解！";
     cert.style.display='none';
