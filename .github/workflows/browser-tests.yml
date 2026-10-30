@@ -1,0 +1,43 @@
+name: Browser regression tests
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  browser-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: tests/package-lock.json
+      - name: Install locked test dependencies
+        run: npm ci --prefix tests
+      - name: Install Chromium and system dependencies
+        working-directory: tests
+        run: npx playwright install --with-deps chromium
+      - name: Start local application server
+        run: |
+          python3 -m http.server 8014 --bind 127.0.0.1 > /tmp/norikae-server.log 2>&1 &
+          python3 tests/wait-for-server.py http://127.0.0.1:8014/
+      - name: Run all browser regression tests
+        env:
+          TEST_URL: http://127.0.0.1:8014
+        shell: bash
+        run: |
+          export CHROMIUM_PATH="$(node -p "require('./tests/node_modules/playwright').chromium.executablePath()")"
+          set -o pipefail
+          node --test --test-reporter=tap tests/*.cjs | tee browser-test-results.tap
+      - name: Preserve test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-test-results
+          path: |
+            browser-test-results.tap
+            /tmp/norikae-server.log
+          retention-days: 7
