@@ -16,6 +16,7 @@ run_smoke() {
     if [ -f "$DATA/Documents/smoke-results.json" ]; then
       cp "$DATA/Documents/smoke-results.json" "artifacts/$phase.json"
       cat "artifacts/$phase.json"
+      python3 scripts/report-ios-failure.py "artifacts/$phase.json"
       python3 -c 'import json,sys; result=json.load(open(sys.argv[1])); assert result.get("success") is True,result' "artifacts/$phase.json"
       xcrun simctl io "$SIMULATOR_ID" screenshot "artifacts/$phase.png"
       return

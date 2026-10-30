@@ -29,6 +29,7 @@ test('iPhone bundle layout, touch, modes, audio and offline local requests',asyn
       await page.clock.install({time:new Date('2026-10-30T00:00:00Z')});await page.clock.pauseAt(new Date('2026-10-30T00:00:01Z'));
       for(const mode of ['beginner','intermediate','extreme']){
         await page.evaluate(()=>goHome());await page.locator(`.mode-btn.${mode}`).tap();assert.equal(await page.locator('#choices button').count(),4);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+        const back=await page.locator('#game .back-row button').boundingBox(),head=await page.locator('#game .game-head').boundingBox();assert(back.y>=head.y&&back.y+back.height<=head.y+head.height,'native back control stays within game header');
         const i=await page.evaluate(()=>currentOptions.findIndex(x=>x.correct));await page.locator('#choices button').nth(i).tap();await page.clock.runFor(6000);await page.locator('#answerJourneyNext').tap();assert.equal(await page.locator('#qnum').textContent(),'2');
       }
       await page.evaluate(()=>{goHome();startRush();answerChoice(currentOptions.findIndex(x=>!x.correct));completePendingQuestion()});assert.equal(await page.locator('#rushCorrectCount').textContent(),'0');

@@ -39,10 +39,13 @@ jobs:
         run: |
           mkdir -p artifacts
           set -o pipefail
-          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+          if ! xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY='' build 2>&1 | tee artifacts/xcodebuild.log
+            CODE_SIGN_IDENTITY='' build 2>&1 | tee artifacts/xcodebuild.log; then
+            python3 scripts/report-ios-failure.py artifacts/xcodebuild.log
+            exit 1
+          fi
       - name: Real WKWebView smoke, native share and Preferences restore
         run: bash scripts/ios-simulator-smoke.sh
       - name: Package unsigned Simulator app
