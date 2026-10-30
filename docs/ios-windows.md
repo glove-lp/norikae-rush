@@ -50,7 +50,7 @@ Apple向けコンパイルはWindows上では実行できず、GitHubのmacOSジ
 
 `.github/workflows/ios-simulator.yml` はpush/PRで実行します。
 
-1. macos-15上のXcode 26以降を選択、lockfileどおりにnpmをインストール。
+1. macos-15-intel上のXcode 26以降を選択、lockfileどおりにnpmをインストール。
 2. `npm run sync:ios` でWeb資産とSPMプラグインを同期。
 3. `xcodebuild` の `iphonesimulator` / Debug / `CODE_SIGNING_ALLOWED=NO` でビルド。
 4. iPhone Simulatorへインストール・起動。Debug限定の `--smoke-test` で実際のWKWebViewを検証。
@@ -91,7 +91,7 @@ ffmpeg -i after_fanfare_aishu.ogg -c:a aac -b:a 160k -movflags +faststart mobile
 ## 費用
 
 - 今回はApple契約不要、Macの購入費用不要。Capacitor/ローカル開発ツールは無償。
-- 公開リポジトリの標準GitHub-hosted runner（このmacos-15を含む）は通常無料。非公開化、larger runner、
+- 公開リポジトリの標準GitHub-hosted runner（このmacos-15-intelを含む）は通常無料。非公開化、larger runner、
   保存量超過等では課金条件が変わるため、GitHubのBillingと利用枠を確認してください。有料サービスは契約していません。
 - TestFlight/App Store段階ではApple Developer Programが通常年99 USD相当（地域・税で異なる）。
   個人登録では販売元が個人名になります。最新の地域料金は登録前に確認してください。

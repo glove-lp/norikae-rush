@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 mkdir -p artifacts
+exec > >(tee -a artifacts/simulator.log) 2>&1
+on_error() {
+  local status=$?
+  trap - ERR
+  python3 scripts/report-ios-failure.py artifacts/simulator.log
+  exit "$status"
+}
+set -E
+trap on_error ERR
 SIMULATOR_ID="$(xcrun simctl list devices available -j | python3 -c 'import sys,json; d=json.load(sys.stdin)["devices"]; phones=[x for runtime in sorted(d,reverse=True) for x in d[runtime] if x["name"].startswith("iPhone")]; assert phones,"No available iPhone Simulator"; print(phones[0]["udid"])')"
 echo "Using iPhone Simulator $SIMULATOR_ID"
 xcrun simctl boot "$SIMULATOR_ID" || true
