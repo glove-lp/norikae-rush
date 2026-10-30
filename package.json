@@ -1,0 +1,21 @@
+{
+  "name": "norikae-rush-ios",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:ios": "node scripts/build-mobile.mjs",
+    "sync:ios": "npm run build:ios && cap sync ios",
+    "test": "node --test tests/*.cjs"
+  },
+  "dependencies": {
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/filesystem": "8.1.5",
+    "@capacitor/ios": "8.6.0",
+    "@capacitor/preferences": "8.0.1",
+    "@capacitor/share": "8.0.3"
+  },
+  "devDependencies": {"@capacitor/cli": "8.6.0", "esbuild": "0.28.2"},
+  "engines": {"node": ">=22"}
+}

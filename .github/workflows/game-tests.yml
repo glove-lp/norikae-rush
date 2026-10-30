@@ -21,11 +21,12 @@ jobs:
         with:
           node-version: '22'
       - name: Install Playwright (test dependency)
-        run: npm install --no-save --no-package-lock playwright@1.56.1
+        run: npm ci && npm ci --prefix tests && npm run build:ios
       - name: Install Chromium and system dependencies
+        working-directory: tests
         run: npx playwright install --with-deps chromium
       - name: Configure browser executable
-        run: echo "CHROMIUM_PATH=$(node -e 'process.stdout.write(require("playwright").chromium.executablePath())')" >> "$GITHUB_ENV"
+        run: echo "CHROMIUM_PATH=$(node -e 'process.stdout.write(require("./tests/node_modules/playwright").chromium.executablePath())')" >> "$GITHUB_ENV"
       - name: Start local server
         run: |
           python3 -m http.server 8011 --bind 127.0.0.1 > /tmp/norikae-http.log 2>&1 &

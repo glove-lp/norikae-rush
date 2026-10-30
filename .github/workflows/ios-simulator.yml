@@ -1,0 +1,56 @@
+name: iOS Simulator (unsigned)
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  ios-simulator:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Select newest installed Xcode
+        run: |
+          XCODE_APP="$(python3 - <<'PY'
+          import pathlib,plistlib
+          apps=[p for p in pathlib.Path('/Applications').glob('Xcode*.app') if 'beta' not in p.name.lower()]
+          def version(app):
+              data=plistlib.loads((app/'Contents/version.plist').read_bytes())
+              return tuple(int(x) for x in data['CFBundleShortVersionString'].split('.'))
+          app=max(apps,key=version)
+          assert version(app)[0]>=26,'Capacitor 8 requires Xcode 26 or later'
+          print(app)
+          PY
+          )"
+          sudo xcode-select -s "$XCODE_APP/Contents/Developer"
+          xcodebuild -version
+          xcrun simctl list devices available
+      - run: npm ci
+      - name: Build bundled game and sync native plugins
+        run: npm run sync:ios
+      - name: Unsigned Simulator build (no Apple account)
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          set -o pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY='' build 2>&1 | tee artifacts/xcodebuild.log
+      - name: Real WKWebView smoke, native share and Preferences restore
+        run: bash scripts/ios-simulator-smoke.sh
+      - name: Package unsigned Simulator app
+        run: ditto -c -k --sequesterRsrc --keepParent build/ios/Build/Products/Debug-iphonesimulator/App.app artifacts/NorikaeRush-Simulator.app.zip
+      - name: Save build logs, smoke results and Simulator app
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator
+          path: artifacts/
+          retention-days: 7

@@ -1,0 +1,6 @@
+{
+  "appId": "jp.norikae.rush",
+  "appName": "乗り換えRUSH",
+  "webDir": "mobile/dist",
+  "ios": {"contentInset": "never", "preferredContentMode": "mobile"}
+}

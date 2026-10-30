@@ -14,7 +14,11 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-          cache-dependency-path: tests/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            tests/package-lock.json
+      - name: Build bundled iOS web assets
+        run: npm ci && npm run build:ios
       - name: Install locked test dependencies
         run: npm ci --prefix tests
       - name: Install Chromium and system dependencies
