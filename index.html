@@ -893,6 +893,7 @@ function formatTopPercent(p){
 let correctAudioCtx = null;
 
 function playCorrectSound(){
+  if(!soundPrefs.enabled)return;
   try{
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if(!AudioCtx) return;
@@ -922,6 +923,7 @@ function playCorrectSound(){
 }
 
 function playWrongSound(){
+  if(!soundPrefs.enabled)return;
   try{
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if(!AudioCtx) return;
@@ -1756,7 +1758,7 @@ function startBgm(mode){
   // v25: official selected BGM
   const dova=getDovaAudio(mode);
   if(dova){
-    dova.volume = mode==="home" ? 0.14 : 0;
+    dova.volume = 0.14;
     dova.currentTime=0;
     dova.play().catch(()=>{});
     return;
@@ -1793,6 +1795,7 @@ function renderSoundChoices(){
 function toggleAllSound(){soundPrefs.enabled=!soundPrefs.enabled;localStorage.setItem("norikaeRushSoundPrefs",JSON.stringify(soundPrefs));stopBgm();if(soundPrefs.enabled)syncScreenAudio();}
 function toggleSoundLab(){document.getElementById("soundLab").classList.toggle("closed");}
 function syncScreenAudio(){
+  if(document.getElementById('battleOverlay')?.classList.contains('open')){stopBgm();return;}
   const active=document.querySelector(".screen.active");if(!active)return;
   if(active.id==="home")startBgm("home");
   else stopBgm();
@@ -1854,7 +1857,7 @@ function battleLater(callback,delay){const token=bQuestionToken;const id=setTime
 function clearBattleAsync(){bFeedbackReady=false;bQuestionToken++;bDone=true;for(const id of bTimeouts)clearTimeout(id);bTimeouts.clear();clearTimeout(bBotTimer);bBotTimer=null;clearInterval(bTick);bTick=null;stopQuizBgm()}
 function resetBattleOverlays(){b$('battleCountdown').textContent='';['battleFeedback','battleJourney','battleVictory'].forEach(id=>b$(id).classList.remove('show'));const btn=b$('battleFeedback').querySelector('button');btn.textContent='次の問題へ';btn.onclick=nextBattleQuestion}
 function battleAudio(){if(!bAudio)bAudio=new(window.AudioContext||window.webkitAudioContext)();if(bAudio.state==='suspended')bAudio.resume();return bAudio}
-function battleTone(freq,delay,dur,vol=.06,type='sine'){const a=battleAudio(),o=a.createOscillator(),g=a.createGain(),t=a.currentTime+delay;o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+.03)}
+function battleTone(freq,delay,dur,vol=.06,type='sine'){if(!soundPrefs.enabled)return;const a=battleAudio(),o=a.createOscillator(),g=a.createGain(),t=a.currentTime+delay;o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+.03)}
 function playBattleIntroSound(){battleTone(523,0,.16,.035);battleTone(659,.14,.18,.035);battleTone(784,.3,.3,.04)}
 function startQuizBgm(){stopQuizBgm();let beat=0;const notes=[392,523,659,523,440,587,698,587];bQuizBeat=setInterval(()=>{if(bDone)return;const left=20-(performance.now()-bStart)/1000,f=left<6?(beat%2?784:988):notes[beat%notes.length];battleTone(f,0,.1,left<6?.018:.012,'triangle');beat++},260)}
 function stopQuizBgm(){if(bQuizBeat){clearInterval(bQuizBeat);bQuizBeat=null}}

@@ -1,0 +1,7 @@
+{
+  "name": "norikae-rush-browser-tests",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {"test": "node --test *.cjs"},
+  "devDependencies": {"playwright": "1.64.1"}
+}
