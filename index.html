@@ -331,6 +331,14 @@ button{-webkit-tap-highlight-color:transparent}
 .master-certificate:before,.master-certificate:after{content:"★";position:absolute;top:10px;color:#d8a700;font-size:22px}.master-certificate:before{left:13px}.master-certificate:after{right:13px}.cert-head{font-size:11px;font-weight:1000;letter-spacing:.28em;color:#9c6700}.cert-title{font-family:serif;font-size:clamp(27px,7vw,38px);font-weight:1000;letter-spacing:.08em;margin:6px 0 10px;border-bottom:2px solid #d8a700;padding-bottom:8px}.cert-body{font-size:13px;font-weight:900;line-height:1.8}.cert-master{display:block;font-size:clamp(20px,5vw,28px);color:#ef3340;margin:6px 0;font-weight:1000}.cert-seal{width:62px;height:62px;margin:10px auto 0;border-radius:50%;display:grid;place-items:center;border:4px double #ef3340;color:#ef3340;font-size:10px;font-weight:1000;line-height:1.05;transform:rotate(-7deg);background:#fff8e8}.master-foot{margin-top:18px;font-size:11px;color:#bcd5ec;font-weight:900}.master-celebration + .mode-chip{display:none}
 @media(max-width:600px){.master-celebration{min-height:515px}.master-content{padding:20px 10px 16px}.master-train-wrap{height:100px}.master-certificate{max-width:94%;padding:15px 13px}.cert-body{font-size:12px}}
 
+/* Keep record labels and values readable without clipping on small screens. */
+.game-record-box{min-width:0}
+.game-record-box .bscore{white-space:normal;overflow-wrap:anywhere}
+.game-record-box .rush-best{margin-top:0}
+@media(max-width:600px){
+  .game-record-box .best-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
 /* Equal battle panels, including the BOT status row. */
 .battle-board{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:stretch}
 .battle-round{align-self:center}
