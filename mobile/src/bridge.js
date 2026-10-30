@@ -11,7 +11,7 @@ export async function initializeNative({
   native = Capacitor.isNativePlatform(), preferences = Preferences,
   filesystem = Filesystem, share = Share, app = App,
 } = {}) {
-  const state = { native, ready: false, storageError: null, async flushStorage() {} };
+  const state = { native, ready: false, stage: 'preferences', storageError: null, async flushStorage() {} };
   window.NativeGame = state;
   if (!native) return state;
 
@@ -73,5 +73,6 @@ export async function initializeNative({
   await app.addListener('appStateChange', ({ isActive }) => {
     if (!isActive) window.NativeAudio?.suspend();
   });
+  state.stage = 'plugins-ready';
   return state;
 }

@@ -1,8 +1,20 @@
 import UIKit
 import WebKit
 import Capacitor
+import AppPlugin
+import PreferencesPlugin
+import FilesystemPlugin
+import SharePlugin
 
 final class GameViewController: CAPBridgeViewController {
+    override func capacitorDidLoad() {
+        // Explicit references keep SPM plugin classes linked and available before JS hydration.
+        if bridge?.plugin(withName: "App") == nil { bridge?.registerPluginInstance(AppPlugin()) }
+        if bridge?.plugin(withName: "Preferences") == nil { bridge?.registerPluginInstance(PreferencesPlugin()) }
+        if bridge?.plugin(withName: "Filesystem") == nil { bridge?.registerPluginInstance(FilesystemPlugin()) }
+        if bridge?.plugin(withName: "Share") == nil { bridge?.registerPluginInstance(SharePlugin()) }
+    }
+
     #if DEBUG
     private var smokeStarted = false
     override func viewDidAppear(_ animated: Bool) {
@@ -34,7 +46,10 @@ final class GameViewController: CAPBridgeViewController {
                 ready = (try? await webView.evaluateJavaScript("window.NativeGame?.ready === true")) as? Bool ?? false
                 if ready { break }
             }
-            guard ready else { throw NSError(domain: "Game did not become ready", code: 2) }
+            guard ready else {
+                let details = (try? await webView.evaluateJavaScript("JSON.stringify({url:location.href,loading:document.getElementById('native-loading')?.textContent,state:window.NativeGame,errors:window.NativeStartupErrors,failure:window.NativeStartupError})")) as? String ?? "No JavaScript diagnostics"
+                throw NSError(domain: "Game did not become ready: " + details, code: 2)
+            }
             if ProcessInfo.processInfo.arguments.contains("--restore-test") {
                 let restored = try await webView.callAsyncJavaScript("""
                 if (localStorage.getItem('norikaeRushNativeSmoke') !== 'persisted') throw Error('Preferences restore failed');
@@ -77,6 +92,7 @@ final class GameViewController: CAPBridgeViewController {
         }
         do {
             let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            try FileManager.default.createDirectory(at: documents, withIntermediateDirectories: true)
             try JSONSerialization.data(withJSONObject: output, options: [.prettyPrinted, .sortedKeys]).write(to: documents.appendingPathComponent("smoke-results.json"), options: .atomic)
         } catch { NSLog("Could not write smoke results: %@", String(describing: error)) }
     }
@@ -90,7 +106,7 @@ final class GameViewController: CAPBridgeViewController {
     assert(document.querySelector('meta[name=viewport]').content.includes('viewport-fit=cover'),'safe area viewport');
     assert(parseFloat(getComputedStyle(document.body).paddingTop)>=0,'safe area CSS resolved');
     assert(document.documentElement.scrollWidth<=innerWidth,'no horizontal overflow');
-    for(const asset of ['train_matsu.m4a','after_fanfare_aishu.m4a']){const response=await fetch(asset);assert(response.ok&&(await response.arrayBuffer()).byteLength>1000000,'offline bundled audio '+asset)}
+    for(const id of ['dovaHomeBgm','dovaResultBgm']){const audio=document.getElementById(id);assert(audio.src.startsWith('capacitor://localhost/'),'bundled audio URL '+id);if(audio.readyState<2)await new Promise((resolve,reject)=>{audio.addEventListener('canplay',resolve,{once:true});audio.addEventListener('error',()=>reject(Error('Audio failed '+id)),{once:true});setTimeout(()=>reject(Error('Audio timeout '+id)),10000);audio.load()});assert(audio.readyState>=2,'offline AAC loaded '+id)}
     for(const mode of ['beginner','intermediate','extreme']){
       startGame(mode);
       for(let i=0;i<5;i++){assert(currentOptions.length===4,mode+' four options '+i);answerChoice(currentOptions.findIndex(x=>x.correct));completePendingQuestion()}

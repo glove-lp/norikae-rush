@@ -20,6 +20,7 @@ test('iPhone bundle layout, touch, modes, audio and offline local requests',asyn
       const context=await browser.newContext({viewport:{width,height:844},isMobile:true,hasTouch:true});
       const page=await context.newPage();const errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));
       await page.route('**/*',route=>{if(new URL(route.request().url()).origin===new URL(root).origin)return route.continue();external.push(route.request().url());return route.abort()});
+      await page.addInitScript(()=>{window.fetch=()=>Promise.reject(new Error('Custom-scheme fetch is unavailable'))});
       await page.goto(app);await page.waitForFunction(()=>window.NativeGame?.ready);
       await page.evaluate(()=>{document.documentElement.style.setProperty('--native-top','47px');document.documentElement.style.setProperty('--native-bottom','34px')});
       assert.match(await page.locator('meta[name=viewport]').getAttribute('content'),/viewport-fit=cover/);

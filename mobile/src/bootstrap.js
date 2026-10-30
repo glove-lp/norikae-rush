@@ -2,9 +2,9 @@ import { initializeNative } from './bridge.js';
 
 try {
   const state = await initializeNative();
-  const response = await fetch('game-scripts.json');
-  if (!response.ok) throw new Error('Missing bundled game scripts');
-  for (const src of await response.json()) {
+  const scripts = JSON.parse(document.getElementById('native-game-scripts').textContent);
+  for (const src of scripts) {
+    state.stage = `loading:${src}`;
     await new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = src; script.onload = resolve; script.onerror = reject;
@@ -18,10 +18,12 @@ try {
     window.toggleAllSound(); window.NativeAudio.updateButton();
   });
   window.NativeAudio.updateButton();
+  state.stage = 'ready';
   state.ready = true;
   document.documentElement.dataset.nativeReady = 'true';
   document.getElementById('native-loading').remove();
 } catch (error) {
+  window.NativeStartupError = error.message || String(error);
   console.error('Native startup failed', error);
   document.getElementById('native-loading').textContent = '起動できませんでした。アプリを開き直してください。';
 }

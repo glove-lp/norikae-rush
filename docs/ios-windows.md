@@ -20,7 +20,7 @@ Bundle ID `jp.norikae.rush` は未登録の仮値です。App Store Connectで�
 
 ## Windowsでの開発
 
-Node.js 24 LTS、GitをインストールしてPowerShellで実行します（Mac不要）。
+Node.js 24 LTS、Git、Python 3をインストールしてPowerShellで実行します（Mac不要）。
 
 ```powershell
 npm ci
