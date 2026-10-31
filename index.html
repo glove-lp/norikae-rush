@@ -544,6 +544,56 @@ button{-webkit-tap-highlight-color:transparent}
   </div>
 
 <script>
+// GA4 is optional: no analytics failure may interrupt a game or a share action.
+const gameAnalytics = (() => {
+  const disabled = { start() {}, finish() {}, share() {} };
+  try {
+    if (location.protocol !== 'https:' || !['norikae-rush.jp', 'www.norikae-rush.jp'].includes(location.hostname)) return disabled;
+    const measurementId = 'G-V48HF21Y4C';
+    const modes = new Set(['beginner', 'intermediate', 'extreme', 'rush', 'battle']);
+    const results = new Set(['s_rank', 'a_rank', 'b_rank', 'c_rank', 'd_rank', 'master', 'wrong', 'timeout', 'win', 'loss', 'quit']);
+    const safe = fn => (...args) => { try { fn(...args); } catch (_) {} };
+    window.dataLayer = window.dataLayer || [];
+    if (typeof window.gtag !== 'function') window.gtag = function() { return window.dataLayer.push(arguments); };
+    const command = safe((...args) => {
+      const pending = window.gtag(...args);
+      if (pending && typeof pending.catch === 'function') pending.catch(() => {});
+    });
+    const emit = (name, params) => command('event', name, { send_to: measurementId, ...params });
+    // Fixed page metadata prevents query/hash/referrer text from entering event payloads.
+    const page = { page_location: 'https://norikae-rush.jp/', page_title: '乗り換えRUSH', page_referrer: '' };
+    command('js', new Date());
+    command('config', measurementId, { ...page, send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false });
+    emit('page_view', page);
+    if (!document.getElementById('norikae-ga4')) {
+      const tag = document.createElement('script');
+      tag.id = 'norikae-ga4'; tag.async = true; tag.referrerPolicy = 'no-referrer';
+      tag.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+      document.head.append(tag);
+    }
+    let run = null;
+    return {
+      start: safe(mode => {
+        if (!modes.has(mode) || (run && !run.ended && run.mode === mode)) return;
+        run = { mode, ended: false, shared: false, result: null };
+        emit('game_start', { game_mode: mode });
+      }),
+      finish: safe((mode, result, correctCount) => {
+        if (!run || run.mode !== mode || run.ended || !results.has(result)) return;
+        run.ended = true;
+        run.result = { game_mode: mode, result, correct_count: Number.isFinite(correctCount) ? Math.max(0, Math.min(10000, Math.floor(correctCount))) : 0 };
+        emit('game_end', run.result);
+      }),
+      share: safe(mode => {
+        if (!run || run.mode !== mode || !run.ended || run.shared) return;
+        run.shared = true;
+        // Button activation, not proof of a completed external SNS post.
+        emit('result_share', run.result);
+      }),
+    };
+  } catch (_) { return disabled; }
+})();
+
 // 主要駅だけに絞った「路線単位」のデータ。
 // 各路線上では、間に表示対象外の駅があっても乗換なしで移動できる。
 // times は、このMVP内での主要駅間の概算所要分（隣接する表示駅同士）。
@@ -1031,6 +1081,7 @@ function startGame(mode="beginner"){
   if(typeof playNextSE==="function") playNextSE();
   gameType="normal";
   currentMode = modeConfig[mode] ? mode : "beginner";
+  gameAnalytics.start(currentMode);
   q = 0; total = 0; records = []; combo = 0; maxComboThisGame = 0; pendingPraise = "";
   rushCorrect=0; rushMasterAchieved=false;
   const sourcePool = modeConfig[currentMode].pool;
@@ -1042,6 +1093,7 @@ function startGame(mode="beginner"){
 }
 
 function startRush(){
+  gameAnalytics.start('rush');
   if(typeof playNextSE==="function") playNextSE();
   gameType="rush";
   currentMode="beginner";
@@ -1352,6 +1404,7 @@ function answerChoice(index){
 }
 
 function goHome(){
+  gameAnalytics.finish(gameType==='rush'?'rush':currentMode,'quit',gameType==='rush'?rushCorrect:records.filter(r=>r.correct).length);
   clearInterval(timerId);
   show('home');
 }
@@ -1458,6 +1511,7 @@ function finishQuestion(timeout, isCorrect=false, answerLabel="", explicitYourTi
 }
 
 function showRushFinal(){
+  gameAnalytics.finish('rush',rushCorrect>=100?'master':(records[records.length-1]?.timeout?'timeout':'wrong'),rushCorrect);
   updateFinalStationMessage('RUSH 終点！');
   clearInterval(timerId);
   if(typeof stopBgm==="function") stopBgm();
@@ -1549,6 +1603,7 @@ function showFinal(){
   // 東京偏差値は正解数を中心に調整。
   // 5問中2問正解（=3問不正解）なら、おおむね偏差値40になる設定。
   const correctCount = records.filter(r => r.correct).length;
+  gameAnalytics.finish(currentMode,grade[0].toLowerCase()+'_rank',correctCount);
   const baseDevByCorrect = [20, 30, 40, 50, 60, 70];
   let dev = baseDevByCorrect[correctCount];
 
@@ -1639,6 +1694,7 @@ ${modeConfig[currentMode].label}｜${correctCount}/5問正解
 #乗り換えRUSH`;
 }
 async function shareResult(){
+  gameAnalytics.share(gameType==='rush'?'rush':currentMode);
   drawShareCard();
   const text = buildShareText();
   const status = document.getElementById('shareStatus');
@@ -1874,9 +1930,9 @@ function renderRivalHearts(){b$('battleRivalHearts').innerHTML=Array.from({lengt
 function ratingRank(n){return n>=1400?'S':n>=1200?'A':n>=1000?'B':'C'}
 function renderHomeBattleRating(){const rank=ratingRank(bRating),next=rank==='C'?1000:rank==='B'?1200:rank==='A'?1400:null;if(b$('homeBattleRank'))b$('homeBattleRank').textContent=rank;if(b$('homeBattleRating'))b$('homeBattleRating').textContent=bRating;if(b$('homeBattleNext'))b$('homeBattleNext').textContent=next?`${ratingRank(next)}ランクまであと${Math.max(0,next-bRating)}`:'最高ランク到達！'}
 function renderBattleRanks(){b$('battleMyRank').textContent=ratingRank(bRating);b$('battleRivalRank').textContent=ratingRank(bRating);renderHomeBattleRating()}
-function startBattle(){clearBattleAsync();resetBattleOverlays();bRound=0;bMy=0;bRival=0;bCorrect=0;bFast=99;bMistakes=0;bRivalMistakes=0;bWonByHearts=false;bRatingApplied=false;buildBattleQuestions();if(typeof stopBgm==='function')stopBgm();battleAudio();b$('battleOverlay').classList.add('open');b$('battleVictory').classList.remove('show');document.body.style.overflow='hidden';const map=document.querySelector('#hintMap img'),train=document.querySelector('#answerJourneyTrain img');if(map)b$('battleMapImg').src=map.src;if(train){b$('battleTrainImg').src=train.src;b$('victoryTrainImg').src=train.src}renderBattleHearts();renderRivalHearts();renderBattleRanks();loadBattleQuestion()}
+function startBattle(){gameAnalytics.start('battle');clearBattleAsync();resetBattleOverlays();bRound=0;bMy=0;bRival=0;bCorrect=0;bFast=99;bMistakes=0;bRivalMistakes=0;bWonByHearts=false;bRatingApplied=false;buildBattleQuestions();if(typeof stopBgm==='function')stopBgm();battleAudio();b$('battleOverlay').classList.add('open');b$('battleVictory').classList.remove('show');document.body.style.overflow='hidden';const map=document.querySelector('#hintMap img'),train=document.querySelector('#answerJourneyTrain img');if(map)b$('battleMapImg').src=map.src;if(train){b$('battleTrainImg').src=train.src;b$('victoryTrainImg').src=train.src}renderBattleHearts();renderRivalHearts();renderBattleRanks();loadBattleQuestion()}
 function retryBattle(){b$('battleVictory').classList.remove('show');startBattle()}
-function closeBattle(){clearBattleAsync();resetBattleOverlays();b$('battleOverlay').classList.remove('open');b$('battleFeedback').classList.remove('show');b$('battleJourney').classList.remove('show');b$('battleVictory').classList.remove('show');document.body.style.overflow='';if(typeof syncScreenAudio==='function')syncScreenAudio()}
+function closeBattle(){gameAnalytics.finish('battle','quit',bCorrect);clearBattleAsync();resetBattleOverlays();b$('battleOverlay').classList.remove('open');b$('battleFeedback').classList.remove('show');b$('battleJourney').classList.remove('show');b$('battleVictory').classList.remove('show');document.body.style.overflow='';if(typeof syncScreenAudio==='function')syncScreenAudio()}
 function setBattlePin(id,name){const el=b$(id),raw=BATTLE_POS[name]||HINT_STATION_POSITIONS[name],p=Array.isArray(raw)?raw:(raw?[raw.x,raw.y]:null);if(!p){el.style.display='none';return}el.style.display='block';el.style.left=p[0]+'%';el.style.top=p[1]+'%';el.querySelector('em').textContent=name}
 function loadBattleQuestion(){clearBattleAsync();b$('battleJourney').classList.remove('show');const token=bQuestionToken;bDone=false;bSecond=false;bPressed=false;const q=BATTLE_Q[bRound%BATTLE_Q.length];b$('battleFrom').textContent=q.from;b$('battleTo').textContent=q.to;b$('battleRound').innerHTML=`第${bRound+1}問<br><small>5点先取</small>`;b$('battleMyScore').textContent=bMy;b$('battleRivalScore').textContent=bRival;b$('battlePressTime').textContent='BOT・回答待ち';b$('battleNotice').textContent='問題を表示中…';b$('battleRivalClock').style.setProperty('--ring','360deg');b$('battleMainTimer').style.setProperty('--time','360deg');b$('battleSeconds').textContent='20.0';setBattlePin('battleStartPin',q.from);setBattlePin('battleGoalPin',q.to);b$('battleOptions').innerHTML=q.choices.map((x,i)=>`<button class="battle-option" disabled onclick="battleAnswer(${i},this)">${'ABCD'[i]}　${x}</button>`).join('');['battleFrom','battleRouteArrow','battleTo'].forEach(id=>b$(id).classList.remove('reveal'));playBattleIntroSound();battleLater(()=>{if(token===bQuestionToken)b$('battleFrom').classList.add('reveal')},300);battleLater(()=>{if(token===bQuestionToken)b$('battleRouteArrow').classList.add('reveal')},950);battleLater(()=>{if(token===bQuestionToken)b$('battleTo').classList.add('reveal')},1550);battleLater(()=>{if(token!==bQuestionToken)return;b$('battleNotice').textContent='先に最速ルートを見抜け！';document.querySelectorAll('.battle-option').forEach(x=>x.disabled=false);beginBattleQuestion(token)},2200)}
 function beginBattleQuestion(token){if(bDone||token!==bQuestionToken)return;bStart=performance.now();startQuizBgm();const delay=4500+Math.random()*7000;bBotTimer=battleLater(()=>battleRivalAnswers(token),delay);bTick=setInterval(updateBattleTimer,50)}
@@ -1902,12 +1958,13 @@ function showBattleFeedback(){
   }
   tick();
 }
-function finishBattleRound(winner,title,text){if(bDone)return;clearBattleAsync();b$('battleFeedbackTitle').textContent=title;b$('battleFeedbackText').textContent=text;if(winner==='draw'||winner==='heartloss'||winner==='botheartloss')showBattleFeedback();else playBattleJourney(title)}
+function finishBattleRound(winner,title,text){if(bDone)return;clearBattleAsync();if(battleMatchFinished())gameAnalytics.finish('battle',bMy>=5||bWonByHearts?'win':'loss',bCorrect);b$('battleFeedbackTitle').textContent=title;b$('battleFeedbackText').textContent=text;if(winner==='draw'||winner==='heartloss'||winner==='botheartloss')showBattleFeedback();else playBattleJourney(title)}
 function playBattleJourney(title){const q=BATTLE_Q[bRound%BATTLE_Q.length],transfer=q.transfers[0],train=b$('battleTrain');b$('battleJourneyTitle').textContent=title==='相手が正解！'?'🚅 相手の正解ルート':'🚃 あなたの正解ルート';b$('battleJRoute').textContent=`${q.from} → ${transfer} → ${q.to}`;b$('battleJLines').textContent=`利用路線：${q.lines.join(' → ')}${q.masterTime?` ／ 約${q.masterTime}分`:''}`;b$('battleJStations').innerHTML=[q.from,transfer,q.to].map(x=>`<div class="battle-jstation"><i></i><b>${x}</b></div>`).join('');train.style.transition='none';train.style.left='4%';b$('battleJourney').classList.add('show');battleLater(()=>{train.style.transition='left .75s cubic-bezier(.35,.1,.18,1)';train.style.left='calc(50% - 55px)'},180);battleLater(()=>train.style.left='calc(96% - 110px)',1050);battleLater(()=>{b$('battleJourney').classList.remove('show');showBattleFeedback()},2050)}
 function applyBattleRating(delta){if(bRatingApplied)return {before:bRating,after:bRating};const before=bRating;bRating=Math.max(0,bRating+delta);localStorage.setItem('norikaeBattleRating',bRating);bRatingApplied=true;renderBattleRanks();return {before,after:bRating}}
 function fillVictoryConfetti(){const box=b$('victoryConfetti'),colors=['#ef3340','#ffd84c','#2f72e9','#39b86b','#9b5de5','#ff7a00'];box.innerHTML=Array.from({length:70},(_,i)=>`<i class="confetti-piece" style="left:${Math.random()*100}%;background:${colors[i%colors.length]};--fall:${3+Math.random()*3}s;--delay:${-Math.random()*5}s;--drift:${-80+Math.random()*160}px;--rot:${Math.random()*180}deg"></i>`).join('')}
 let lastBattleRatingAfter=800;
 async function shareBattleResult(){
+  gameAnalytics.share('battle');
   const rank=ratingRank(lastBattleRatingAfter);
   const text=`⚔️ 乗り換えRUSH BATTLE 勝利！\n🏆 YOU ${bMy} - ${bRival} RIVAL\nRANK ${rank}｜Rating ${lastBattleRatingAfter.toLocaleString()}\n東京の乗り換え、どっちが強い？🚃🔥\n#乗り換えRUSH`;
   const url='https://norikae-rush.jp/';
@@ -1915,8 +1972,8 @@ async function shareBattleResult(){
   try{await navigator.clipboard.writeText(text+'\n'+url)}catch(e){}
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(url),'_blank','noopener');
 }
-function showBattleVictory(){const r=applyBattleRating(24);lastBattleRatingAfter=r.after;b$('victoryMyScore').textContent=bMy;b$('victoryRivalScore').textContent=bRival;b$('victoryQuestions').textContent=bCorrect;b$('victoryFast').textContent=bFast===99?'—':bFast.toFixed(2)+'秒';b$('victoryRank').textContent=ratingRank(r.after);b$('victoryRating').textContent=`${ratingRank(r.after)} RANK · ${r.before} → ${r.after}（+24）`;fillVictoryConfetti();b$('battleVictory').classList.add('show');[523,659,784,1047,1319].forEach((f,i)=>battleTone(f,i*.09,.25,.025,'triangle'))}
-function nextBattleQuestion(){if(!bFeedbackReady||!b$('battleOverlay').classList.contains('open'))return;clearBattleAsync();b$('battleCountdown').textContent='';b$('battleFeedback').classList.remove('show');if(bMy>=5||bWonByHearts){showBattleVictory();return}if(bRival>=5||bMistakes>=5){const r=applyBattleRating(-18);b$('battleFeedbackTitle').textContent='YOU LOSE';b$('battleFeedbackText').textContent=(bMistakes>=5?'5回間違えたため敗北':`${bMy} - ${bRival}`)+` ／ ${ratingRank(r.after)} RANK ${r.after}（-18）`;b$('battleFeedback').classList.add('show');const btn=b$('battleFeedback').querySelector('button');btn.textContent='トップへ戻る';btn.onclick=()=>{btn.textContent='次の問題へ';btn.onclick=nextBattleQuestion;closeBattle()};return}bRound++;loadBattleQuestion()}
+function showBattleVictory(){gameAnalytics.finish('battle','win',bCorrect);const r=applyBattleRating(24);lastBattleRatingAfter=r.after;b$('victoryMyScore').textContent=bMy;b$('victoryRivalScore').textContent=bRival;b$('victoryQuestions').textContent=bCorrect;b$('victoryFast').textContent=bFast===99?'—':bFast.toFixed(2)+'秒';b$('victoryRank').textContent=ratingRank(r.after);b$('victoryRating').textContent=`${ratingRank(r.after)} RANK · ${r.before} → ${r.after}（+24）`;fillVictoryConfetti();b$('battleVictory').classList.add('show');[523,659,784,1047,1319].forEach((f,i)=>battleTone(f,i*.09,.25,.025,'triangle'))}
+function nextBattleQuestion(){if(!bFeedbackReady||!b$('battleOverlay').classList.contains('open'))return;clearBattleAsync();b$('battleCountdown').textContent='';b$('battleFeedback').classList.remove('show');if(bMy>=5||bWonByHearts){showBattleVictory();return}if(bRival>=5||bMistakes>=5){gameAnalytics.finish('battle','loss',bCorrect);const r=applyBattleRating(-18);b$('battleFeedbackTitle').textContent='YOU LOSE';b$('battleFeedbackText').textContent=(bMistakes>=5?'5回間違えたため敗北':`${bMy} - ${bRival}`)+` ／ ${ratingRank(r.after)} RANK ${r.after}（-18）`;b$('battleFeedback').classList.add('show');const btn=b$('battleFeedback').querySelector('button');btn.textContent='トップへ戻る';btn.onclick=()=>{btn.textContent='次の問題へ';btn.onclick=nextBattleQuestion;closeBattle()};return}bRound++;loadBattleQuestion()}
 renderHomeBattleRating();
 </script>
 </body>
