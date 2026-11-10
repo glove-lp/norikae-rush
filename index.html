@@ -7,6 +7,18 @@
   <title>乗り換えRUSH</title>
   <link rel="canonical" href="https://norikae-rush.jp/" />
   <meta name="description" content="東京の乗り換え力を試す最速ルートクイズ。通常・ラッシュ・バトルの3モードで挑戦！" />
+  <!-- Google Analytics 4: privacy-safe aggregate usage events only -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-V48HF21Y4C"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){window.dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', 'G-V48HF21Y4C');
+    function trackGameEvent(name, params = {}) {
+      if (typeof window.gtag === 'function') window.gtag('event', name, params);
+    }
+  </script>
   <meta property="og:title" content="乗り換えRUSH" />
   <meta property="og:description" content="あなたは最速ルートを見抜ける？ 東京の乗り換え力をゲームで勝負！" />
   <meta property="og:url" content="https://norikae-rush.jp/" />
@@ -1031,6 +1043,7 @@ function startGame(mode="beginner"){
   if(typeof playNextSE==="function") playNextSE();
   gameType="normal";
   currentMode = modeConfig[mode] ? mode : "beginner";
+  trackGameEvent("game_start", { mode: currentMode });
   q = 0; total = 0; records = []; combo = 0; maxComboThisGame = 0; pendingPraise = "";
   rushCorrect=0; rushMasterAchieved=false;
   const sourcePool = modeConfig[currentMode].pool;
@@ -1044,6 +1057,7 @@ function startGame(mode="beginner"){
 function startRush(){
   if(typeof playNextSE==="function") playNextSE();
   gameType="rush";
+  trackGameEvent("game_start", { mode: "rush" });
   currentMode="beginner";
   q=0; total=0; records=[]; combo=0; maxComboThisGame=0; pendingPraise="";
   rushCorrect=0; rushMasterAchieved=false;
@@ -1656,6 +1670,7 @@ async function shareResult(){
       const data={title:"乗り換えRUSH",text,url};
       if(file && navigator.canShare && navigator.canShare({files:[file]})) data.files=[file];
       await navigator.share(data);
+      trackGameEvent("game_share", { mode: "normal" });
       if(status)status.textContent="シェアしました";
       return;
     }
@@ -1666,6 +1681,7 @@ async function shareResult(){
   // PC fallback: open X composer; also copy full result for Instagram/LINE etc.
   try{ await navigator.clipboard.writeText(text+"\n"+url); }catch(e){}
   const xUrl="https://twitter.com/intent/tweet?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(url);
+  trackGameEvent("game_share", { mode: "normal" });
   window.open(xUrl,"_blank","noopener");
   if(status)status.textContent="結果をコピーし、Xの投稿画面を開きました。InstagramやLINEにはコピーした内容を貼り付けられます。";
 }
@@ -1874,7 +1890,7 @@ function renderRivalHearts(){b$('battleRivalHearts').innerHTML=Array.from({lengt
 function ratingRank(n){return n>=1400?'S':n>=1200?'A':n>=1000?'B':'C'}
 function renderHomeBattleRating(){const rank=ratingRank(bRating),next=rank==='C'?1000:rank==='B'?1200:rank==='A'?1400:null;if(b$('homeBattleRank'))b$('homeBattleRank').textContent=rank;if(b$('homeBattleRating'))b$('homeBattleRating').textContent=bRating;if(b$('homeBattleNext'))b$('homeBattleNext').textContent=next?`${ratingRank(next)}ランクまであと${Math.max(0,next-bRating)}`:'最高ランク到達！'}
 function renderBattleRanks(){b$('battleMyRank').textContent=ratingRank(bRating);b$('battleRivalRank').textContent=ratingRank(bRating);renderHomeBattleRating()}
-function startBattle(){clearBattleAsync();resetBattleOverlays();bRound=0;bMy=0;bRival=0;bCorrect=0;bFast=99;bMistakes=0;bRivalMistakes=0;bWonByHearts=false;bRatingApplied=false;buildBattleQuestions();if(typeof stopBgm==='function')stopBgm();battleAudio();b$('battleOverlay').classList.add('open');b$('battleVictory').classList.remove('show');document.body.style.overflow='hidden';const map=document.querySelector('#hintMap img'),train=document.querySelector('#answerJourneyTrain img');if(map)b$('battleMapImg').src=map.src;if(train){b$('battleTrainImg').src=train.src;b$('victoryTrainImg').src=train.src}renderBattleHearts();renderRivalHearts();renderBattleRanks();loadBattleQuestion()}
+function startBattle(){trackGameEvent("game_start", { mode: "battle" });clearBattleAsync();resetBattleOverlays();bRound=0;bMy=0;bRival=0;bCorrect=0;bFast=99;bMistakes=0;bRivalMistakes=0;bWonByHearts=false;bRatingApplied=false;buildBattleQuestions();if(typeof stopBgm==='function')stopBgm();battleAudio();b$('battleOverlay').classList.add('open');b$('battleVictory').classList.remove('show');document.body.style.overflow='hidden';const map=document.querySelector('#hintMap img'),train=document.querySelector('#answerJourneyTrain img');if(map)b$('battleMapImg').src=map.src;if(train){b$('battleTrainImg').src=train.src;b$('victoryTrainImg').src=train.src}renderBattleHearts();renderRivalHearts();renderBattleRanks();loadBattleQuestion()}
 function retryBattle(){b$('battleVictory').classList.remove('show');startBattle()}
 function closeBattle(){clearBattleAsync();resetBattleOverlays();b$('battleOverlay').classList.remove('open');b$('battleFeedback').classList.remove('show');b$('battleJourney').classList.remove('show');b$('battleVictory').classList.remove('show');document.body.style.overflow='';if(typeof syncScreenAudio==='function')syncScreenAudio()}
 function setBattlePin(id,name){const el=b$(id),raw=BATTLE_POS[name]||HINT_STATION_POSITIONS[name],p=Array.isArray(raw)?raw:(raw?[raw.x,raw.y]:null);if(!p){el.style.display='none';return}el.style.display='block';el.style.left=p[0]+'%';el.style.top=p[1]+'%';el.querySelector('em').textContent=name}
@@ -1911,8 +1927,9 @@ async function shareBattleResult(){
   const rank=ratingRank(lastBattleRatingAfter);
   const text=`⚔️ 乗り換えRUSH BATTLE 勝利！\n🏆 YOU ${bMy} - ${bRival} RIVAL\nRANK ${rank}｜Rating ${lastBattleRatingAfter.toLocaleString()}\n東京の乗り換え、どっちが強い？🚃🔥\n#乗り換えRUSH`;
   const url='https://norikae-rush.jp/';
-  try{if(navigator.share){await navigator.share({title:'乗り換えRUSH',text,url});return}}catch(e){if(e&&e.name==='AbortError')return}
+  try{if(navigator.share){await navigator.share({title:'乗り換えRUSH',text,url});trackGameEvent("game_share", { mode: "battle" });return}}catch(e){if(e&&e.name==='AbortError')return}
   try{await navigator.clipboard.writeText(text+'\n'+url)}catch(e){}
+  trackGameEvent("game_share", { mode: "battle" });
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+encodeURIComponent(url),'_blank','noopener');
 }
 function showBattleVictory(){const r=applyBattleRating(24);lastBattleRatingAfter=r.after;b$('victoryMyScore').textContent=bMy;b$('victoryRivalScore').textContent=bRival;b$('victoryQuestions').textContent=bCorrect;b$('victoryFast').textContent=bFast===99?'—':bFast.toFixed(2)+'秒';b$('victoryRank').textContent=ratingRank(r.after);b$('victoryRating').textContent=`${ratingRank(r.after)} RANK · ${r.before} → ${r.after}（+24）`;fillVictoryConfetti();b$('battleVictory').classList.add('show');[523,659,784,1047,1319].forEach((f,i)=>battleTone(f,i*.09,.25,.025,'triangle'))}
