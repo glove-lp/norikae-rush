@@ -8,6 +8,26 @@ test('Issue 5 normal modes and all 300 question definitions',async t=>{
   try{
     const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(url);
     await page.clock.install({time:new Date('2026-10-30T00:00:00Z')});await page.clock.pauseAt(new Date('2026-10-30T00:00:01Z'));
+    await t.test('beginner shuffles the opening question on start and retry',async()=>{
+      const result=await page.evaluate(()=>{
+        const originalRandom=Math.random;
+        try{
+          Math.random=()=>0;
+          startGame('beginner');
+          const opening=window.currentMaster;
+          Math.random=()=>0.999999;
+          restartCurrentGame();
+          return {
+            openingIndex:modeConfig.beginner.pool.indexOf(opening),
+            retryIndex:modeConfig.beginner.pool.indexOf(window.currentMaster),
+            distinctQuestions:new Set(gameQuestions).size
+          };
+        }finally{
+          Math.random=originalRandom;
+        }
+      });
+      assert.deepEqual(result,{openingIndex:1,retryIndex:0,distinctQuestions:5});
+    });
     await t.test('each of 300 masters produces four unique choices and one master answer',async()=>{
       const checked=await page.evaluate(()=>Object.entries(modeConfig).map(([mode,config])=>{
         const results=config.pool.map(master=>{

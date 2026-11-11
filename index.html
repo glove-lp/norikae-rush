@@ -1047,7 +1047,7 @@ function startGame(mode="beginner"){
   q = 0; total = 0; records = []; combo = 0; maxComboThisGame = 0; pendingPraise = "";
   rushCorrect=0; rushMasterAchieved=false;
   const sourcePool = modeConfig[currentMode].pool;
-  gameQuestions = currentMode === "beginner" ? [sourcePool[0], ...shuffleArray(sourcePool.slice(1)).slice(0,4)] : shuffleArray(sourcePool).slice(0, 5);
+  gameQuestions = shuffleArray(sourcePool).slice(0, 5);
   document.getElementById('modeBadge').textContent = modeConfig[currentMode].short;
   document.getElementById('qtotal').textContent = "5";
   document.getElementById('liveLabel').textContent = "スコア";
