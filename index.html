@@ -1039,6 +1039,22 @@ function shuffleArray(arr){
   return a;
 }
 
+function selectGameQuestions(pool, count, mode){
+  const questions = shuffleArray(pool);
+  if(questions.length < 2) return questions.slice(0, count);
+
+  const storageKey = "norikaeRushLastFirst_" + mode;
+  const questionKey = question => JSON.stringify([question.from, question.to]);
+  let previousFirst;
+  try{ previousFirst = localStorage.getItem(storageKey); }catch(e){}
+  if(questionKey(questions[0]) === previousFirst){
+    const nextFirst = questions.findIndex(question => questionKey(question) !== previousFirst);
+    if(nextFirst > 0) [questions[0], questions[nextFirst]] = [questions[nextFirst], questions[0]];
+  }
+  try{ localStorage.setItem(storageKey, questionKey(questions[0])); }catch(e){}
+  return questions.slice(0, count);
+}
+
 function startGame(mode="beginner"){
   if(typeof playNextSE==="function") playNextSE();
   gameType="normal";
@@ -1047,7 +1063,7 @@ function startGame(mode="beginner"){
   q = 0; total = 0; records = []; combo = 0; maxComboThisGame = 0; pendingPraise = "";
   rushCorrect=0; rushMasterAchieved=false;
   const sourcePool = modeConfig[currentMode].pool;
-  gameQuestions = currentMode === "beginner" ? [sourcePool[0], ...shuffleArray(sourcePool.slice(1)).slice(0,4)] : shuffleArray(sourcePool).slice(0, 5);
+  gameQuestions = selectGameQuestions(sourcePool, 5, currentMode);
   document.getElementById('modeBadge').textContent = modeConfig[currentMode].short;
   document.getElementById('qtotal').textContent = "5";
   document.getElementById('liveLabel').textContent = "スコア";
@@ -1062,7 +1078,7 @@ function startRush(){
   q=0; total=0; records=[]; combo=0; maxComboThisGame=0; pendingPraise="";
   rushCorrect=0; rushMasterAchieved=false;
   // 正式な100問マスターを重複なしでシャッフルして出題
-  gameQuestions=shuffleArray(questionPool).slice(0,100);
+  gameQuestions=selectGameQuestions(questionPool,100,"rush");
   document.getElementById('modeBadge').textContent="RUSH";
   document.getElementById('qtotal').textContent=String(gameQuestions.length);
   document.getElementById('liveLabel').textContent="連続正解";
